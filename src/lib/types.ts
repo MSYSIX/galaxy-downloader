@@ -23,6 +23,17 @@ export const API_ERROR_CODES = [
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorDetails = Record<string, unknown>
 export type VideoAudioMode = 'muxed' | 'separate' | 'pure_music' | 'not_applicable'
+export type ResultKind = 'video' | 'audio' | 'picker' | 'image'
+
+export interface PodcastEpisodeInfo {
+    id: string;
+    title: string;
+    cover?: string | null;
+    duration?: number;
+    releaseDate?: string;
+    downloadAudioUrl?: string | null;
+    originDownloadAudioUrl?: string | null;
+}
 export type VideoMediaAction = 'direct-download' | 'merge-then-download' | 'browser-hls-download' | 'hide'
 export type AudioMediaAction = 'direct-download' | 'extract-audio' | 'hide'
 
@@ -102,6 +113,11 @@ export interface UnifiedParseResult {
         images?: Array<string | UnifiedParseResultImage>;
         // 微信公众号文章视频列表
         videos?: EmbeddedVideoInfo[];
+        // 结果类型（picker = 多集选择器，如 Apple Podcasts 节目页）
+        kind?: ResultKind;
+        // Apple Podcasts 单集列表
+        episodes?: PodcastEpisodeInfo[];
+        currentEpisodeId?: string;
     };
     error?: string;
     message?: string;
@@ -155,4 +171,5 @@ export type Platform =
     | 'ins'
     | 'x'
     | 'twitter'
+    | 'apple_podcasts'
     | 'unknown';

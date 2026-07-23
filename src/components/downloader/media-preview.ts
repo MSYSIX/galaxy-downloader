@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '@/lib/config'
-import type { EmbeddedVideoInfo, PageInfo, UnifiedParseResult } from '@/lib/types'
+import type { EmbeddedVideoInfo, PageInfo, PodcastEpisodeInfo, UnifiedParseResult } from '@/lib/types'
 
 import { getResultMediaActions, shouldShowVideoDownloadButton } from './result-card-visibility'
 
@@ -208,6 +208,29 @@ export function canPreviewEmbeddedVideoVideo(video: EmbeddedVideoInfo): boolean 
     })
 
     return videoAction === 'direct-download' && shouldShowVideoDownloadButton(videoDownloadUrl)
+}
+
+export function canPreviewEpisodeAudio(episode: PodcastEpisodeInfo): boolean {
+    const audioUrl = episode.downloadAudioUrl || episode.originDownloadAudioUrl
+    return typeof audioUrl === 'string' && audioUrl.trim().length > 0
+}
+
+export function buildEpisodePreview(
+    sourceUrl: string,
+    episode: PodcastEpisodeInfo,
+    options: { autoplay?: boolean } = {}
+): MediaPreviewRequest | null {
+    if (!sourceUrl.trim() || !canPreviewEpisodeAudio(episode)) {
+        return null
+    }
+
+    return {
+        mediaType: 'audio',
+        sourceUrl,
+        title: episode.title,
+        item: episode.id,
+        autoplay: options.autoplay,
+    }
 }
 
 export function canPreviewEmbeddedVideoAudio(video: EmbeddedVideoInfo): boolean {

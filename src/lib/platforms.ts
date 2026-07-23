@@ -26,6 +26,7 @@ export type CanonicalPlatform =
     | 'tiktok'
     | 'instagram'
     | 'x'
+    | 'apple_podcasts'
     | 'generic'
     | 'unknown'
 
@@ -61,6 +62,7 @@ const PLATFORM_ALIASES: Record<string, CanonicalPlatform> = {
     twitter: 'x',
     generic: 'generic',
     unknown: 'unknown',
+    apple_podcasts: 'apple_podcasts',
 }
 
 const AUDIO_EXTRACTION_PLATFORMS = new Set<CanonicalPlatform>([
@@ -136,6 +138,8 @@ export function getPlatformLabel(
             return dict.history.platforms.instagram
         case 'x':
             return dict.history.platforms.x
+        case 'apple_podcasts':
+            return 'Apple Podcasts'
         case 'generic':
             return dict.history.platforms.generic
         default:
