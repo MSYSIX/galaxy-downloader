@@ -1,6 +1,30 @@
 {
   "versions": [
     {
+      "version": "6.1.0",
+      "date": "2026-07-23",
+      "changes": {
+        "zh": [
+          "新增 Apple Podcasts 支持"
+        ],
+        "en": [
+          "Added Apple Podcasts support"
+        ],
+        "ja": [
+          "Apple Podcasts に対応しました"
+        ],
+        "zh-tw": [
+          "新增 Apple Podcasts 支援"
+        ],
+        "es": [
+          "Se agregó soporte para Apple Podcasts"
+        ],
+        "ru": [
+          "Добавлена поддержка Apple Podcasts"
+        ]
+      }
+    },
+    {
       "version": "6.0.1",
       "date": "2026-06-09",
       "changes": {
