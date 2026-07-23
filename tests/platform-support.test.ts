@@ -31,6 +31,7 @@ const dict = {
             okru: { name: 'OK.ru', summary: 'content' },
             twitch: { name: 'Twitch', summary: 'content' },
             soundcloud: { name: 'SoundCloud', summary: 'content' },
+            applePodcasts: { name: 'Apple Podcasts', summary: 'public audio' },
             comingSoon: 'Coming soon',
         },
     },
@@ -50,6 +51,7 @@ describe('getPlatformSupportItems', () => {
         expect(keys).toContain('tiktok');
         expect(keys).not.toContain('youtube');
         expect(keys).toContain('soundcloud');
+        expect(keys).toContain('applePodcasts');
         expect(keys).toContain('vk');
         expect(keys).toContain('okru');
         expect(keys).toContain('pinterest');

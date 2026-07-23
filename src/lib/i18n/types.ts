@@ -454,6 +454,12 @@ export interface Dictionary {
                 features?: string[];
                 limitations?: string[];
             };
+            applePodcasts: {
+                name: string;
+                summary: string;
+                features?: string[];
+                limitations?: string[];
+            };
             audioTip?: {
                 title: string;
                 steps: string;

@@ -503,6 +503,15 @@
                 "features": [
                     "コンテンツダウンロード"
                 ]
+            },
+            "applePodcasts": {
+                "name": "Apple Podcasts",
+                "summary": "公開ポッドキャスト音声 / エピソード再生とダウンロード",
+                "features": [
+                    "公開音声",
+                    "エピソード再生",
+                    "ダウンロード"
+                ]
             }
         },
         "linkFormats": {

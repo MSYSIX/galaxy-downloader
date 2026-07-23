@@ -503,6 +503,15 @@
                 "features": [
                     "Content Download"
                 ]
+            },
+            "applePodcasts": {
+                "name": "Apple Podcasts",
+                "summary": "Public podcast audio / Episode playback and download",
+                "features": [
+                    "Public audio",
+                    "Episode playback",
+                    "Download"
+                ]
             }
         },
         "linkFormats": {

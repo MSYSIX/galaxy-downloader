@@ -503,6 +503,15 @@
                 "features": [
                     "内容下载"
                 ]
+            },
+            "applePodcasts": {
+                "name": "Apple Podcasts",
+                "summary": "公开播客音频 / 逐集播放与下载",
+                "features": [
+                    "公开音频",
+                    "逐集播放",
+                    "下载"
+                ]
             }
         },
         "linkFormats": {

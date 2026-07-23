@@ -503,6 +503,15 @@
                 "features": [
                     "內容下載"
                 ]
+            },
+            "applePodcasts": {
+                "name": "Apple Podcasts",
+                "summary": "公開 Podcast 音訊 / 逐集播放與下載",
+                "features": [
+                    "公開音訊",
+                    "逐集播放",
+                    "下載"
+                ]
             }
         },
         "linkFormats": {

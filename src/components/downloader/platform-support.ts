@@ -31,6 +31,7 @@ export type PlatformSupportKey =
     | 'okru'
     | 'twitch'
     | 'soundcloud'
+    | 'applePodcasts'
     | 'hls';
 
 type PlatformSupportVisual = {
@@ -175,6 +176,10 @@ const PLATFORM_SUPPORT_VISUALS: Record<PlatformSupportKey, PlatformSupportVisual
         src: '/platform-icons/soundcloud.svg',
         frameClassName: UNIFIED_FRAME_CLASS_NAME,
     },
+    applePodcasts: {
+        src: '/platform-icons/apple-podcasts.svg',
+        frameClassName: UNIFIED_FRAME_CLASS_NAME,
+    },
     hls: {
         src: '/platform-icons/hls.svg',
         darkSrc: '/platform-icons/hls-dark.svg',
@@ -236,5 +241,6 @@ export function getPlatformSupportItems(dict: PlatformSupportDictionary): Platfo
         buildPlatformSupportItem('okru', support.okru),
         buildPlatformSupportItem('twitch', support.twitch),
         buildPlatformSupportItem('soundcloud', support.soundcloud),
+        buildPlatformSupportItem('applePodcasts', support.applePodcasts),
     ].filter((item) => !HIDDEN_PLATFORM_SUPPORT_KEYS.has(item.key));
 }
