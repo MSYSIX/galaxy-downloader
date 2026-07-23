@@ -21,7 +21,6 @@ import {
     localeToHtmlLang,
     localeToOpenGraphLocale,
     resolvePublicMetadataDescription,
-    resolvePublicMetadataKeywords,
 } from "@/lib/seo"
 import { notFound } from "next/navigation";
 
@@ -40,12 +39,10 @@ export async function generateMetadata({
     const dict = await getMessages({ locale }) as Dictionary
     const localeUrl = buildLocaleUrl(locale)
     const publicDescription = resolvePublicMetadataDescription(locale)
-    const publicKeywords = resolvePublicMetadataKeywords(locale)
 
     return {
         title: dict.metadata.title,
         description: publicDescription,
-        keywords: publicKeywords,
         authors: [{ name: dict.metadata.siteName }],
         creator: dict.metadata.siteName,
         publisher: dict.metadata.siteName,

@@ -31,105 +31,29 @@ export const IS_INDEXABLE = explicitIndexableFlag
       ? process.env.VERCEL_ENV === "production"
       : process.env.NODE_ENV === "production"
 
-const PUBLIC_METADATA_COPY: Record<Locale, { description: string; keywords: string[] }> = {
+const PUBLIC_METADATA_COPY: Record<Locale, { description: string }> = {
     en: {
         description: "Free online media downloader for public video, audio, image posts, and HLS/M3U8 streams. Auto-detect supported links and download media without registration.",
-        keywords: [
-            "online media downloader",
-            "online video downloader",
-            "HLS downloader",
-            "M3U8 downloader",
-            "web video downloader",
-            "public video downloader",
-            "audio extractor",
-            "image post downloader",
-            "stream downloader",
-            "browser downloader",
-        ],
     },
     zh: {
         description: "免费在线媒体下载工具，支持公开视频、音频、图文内容与 HLS/M3U8 串流链接识别和下载，无需注册。",
-        keywords: [
-            "在线媒体下载器",
-            "在线视频下载器",
-            "HLS下载器",
-            "M3U8下载器",
-            "网页视频下载",
-            "公开视频下载",
-            "音频提取",
-            "图文下载",
-            "串流下载",
-            "浏览器下载工具",
-        ],
     },
     'zh-tw': {
         description: "免費線上媒體下載工具，支援公開影片、音訊、圖文內容與 HLS/M3U8 串流連結識別和下載，無需註冊。",
-        keywords: [
-            "線上媒體下載器",
-            "線上影片下載器",
-            "HLS下載器",
-            "M3U8下載器",
-            "網頁影片下載",
-            "公開影片下載",
-            "音訊提取",
-            "圖文下載",
-            "串流下載",
-            "瀏覽器下載工具",
-        ],
     },
     ja: {
         description: "公開動画、音声、画像投稿、HLS/M3U8 ストリーム向けの無料オンラインメディアダウンローダー。対応リンクを自動判別し、登録不要でダウンロードできます。",
-        keywords: [
-            "オンラインメディアダウンローダー",
-            "オンライン動画ダウンローダー",
-            "HLSダウンローダー",
-            "M3U8ダウンローダー",
-            "Web動画ダウンロード",
-            "公開動画ダウンロード",
-            "音声抽出",
-            "画像投稿ダウンロード",
-            "ストリームダウンロード",
-            "ブラウザダウンローダー",
-        ],
     },
     es: {
         description: "Descargador online gratuito para videos publicos, audio, publicaciones con imagen y transmisiones HLS/M3U8. Detecta enlaces compatibles y descarga contenido sin registro.",
-        keywords: [
-            "descargador de medios en linea",
-            "descargador de videos online",
-            "descargador HLS",
-            "descargador M3U8",
-            "descargador de video web",
-            "descargador de videos publicos",
-            "extractor de audio",
-            "descargador de publicaciones con imagen",
-            "descargador de streams",
-            "descargador en navegador",
-        ],
     },
     ru: {
         description: "Besplatnyi onlain zagruzchik media dlya publichnykh video, audio, postov s izobrazheniyami i HLS/M3U8-potokov. Avtomaticheski opredelyaet podderzhivaemye ssylki i zagruzhaet kontent bez registratsii.",
-        keywords: [
-            "onlain zagruzchik media",
-            "onlain zagruzchik video",
-            "HLS zagruzchik",
-            "M3U8 zagruzchik",
-            "zagruzchik web-video",
-            "zagruzchik publichnykh video",
-            "izvlechenie audio",
-            "zagruzchik postov s izobrazheniyami",
-            "zagruzchik potokov",
-            "zagruzchik v brauzere",
-        ],
     },
 }
 
 export function resolvePublicMetadataDescription(locale: Locale): string {
     return PUBLIC_METADATA_COPY[locale].description
-}
-
-export function resolvePublicMetadataKeywords(locale: Locale): string[] {
-    return PUBLIC_METADATA_COPY[locale].keywords
 }
 
 export function localeToHrefLang(locale: Locale): string {

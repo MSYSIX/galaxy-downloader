@@ -172,7 +172,6 @@ export interface Dictionary {
     metadata: {
         title: string;
         description: string;
-        keywords: string;
         ogTitle: string;
         ogDescription: string;
         siteName: string;
