@@ -1,5 +1,6 @@
 {
   "name": "bilibili-audio-downloader",
+  "packageManager": "pnpm@11.8.0",
   "version": "2.0.0",
   "scripts": {
     "dev": "vinext dev --port 3010",
@@ -74,16 +75,6 @@
     "vite": "^8.0.16",
     "vitest": "^3.2.6",
     "wrangler": "^4.98.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "unrs-resolver"
-    ],
-    "overrides": {
-      "@types/react": "19.2.14",
-      "@types/react-dom": "19.2.3"
-    }
   },
   "type": "module"
 }
