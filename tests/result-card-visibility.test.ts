@@ -221,4 +221,17 @@ it('falls back to legacy audio-first behavior when videoAudioMode is missing', (
         audioAction: 'direct-download',
     })
 })
+
+it('treats a placeholder video url as no video at all', () => {
+    expect(
+        getResultMediaActions({
+            mediaActions: { video: 'direct-download', audio: 'direct-download' },
+            videoDownloadUrl: '#',
+            audioDownloadUrl: 'https://example.com/audio.mp3',
+        })
+    ).toEqual({
+        videoAction: 'hide',
+        audioAction: 'direct-download',
+    })
+})
 })

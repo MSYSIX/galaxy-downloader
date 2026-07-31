@@ -32,8 +32,14 @@ export interface ResultMediaActions {
     audioAction: ResultAudioAction
 }
 
-function hasSourceUrl(url: string | null | undefined): url is string {
-    return typeof url === 'string' && url.length > 0
+export function hasSourceUrl(url: string | null | undefined): url is string {
+    if (typeof url !== 'string') {
+        return false
+    }
+
+    // 上游偶尔用 '#' 之类的占位符顶替没解析出来的轨道，长度非零但点了什么都拿不到
+    const trimmed = url.trim()
+    return trimmed.length > 0 && trimmed !== '#'
 }
 
 function sanitizeProvidedMediaActions(

@@ -5,6 +5,7 @@ import { AudioResultPanel } from './AudioResultPanel';
 import { ImageResultPanel } from './ImageResultPanel';
 import { type MediaPreviewRequest } from './media-preview';
 import { PodcastPickerPanel } from './PodcastPickerPanel';
+import { hasSourceUrl } from './result-card-visibility';
 import { VideoResultPanel } from './VideoResultPanel';
 
 type ResultData = NonNullable<UnifiedParseResult['data']>;
@@ -13,8 +14,8 @@ function resolveResultKind(result: ResultData): ResultKind {
     if (result.kind) return result.kind;
     if (result.noteType === 'image' && Array.isArray(result.images) && result.images.length > 0) return 'image';
     if (result.episodes && result.episodes.length > 0) return 'picker';
-    const hasVideo = !!(result.downloadVideoUrl || result.originDownloadVideoUrl);
-    const hasAudio = !!(result.downloadAudioUrl || result.originDownloadAudioUrl);
+    const hasVideo = hasSourceUrl(result.downloadVideoUrl) || hasSourceUrl(result.originDownloadVideoUrl);
+    const hasAudio = hasSourceUrl(result.downloadAudioUrl) || hasSourceUrl(result.originDownloadAudioUrl);
     if (!hasVideo && hasAudio) return 'audio';
     return 'video';
 }
