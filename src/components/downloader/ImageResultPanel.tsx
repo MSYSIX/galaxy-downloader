@@ -5,7 +5,8 @@ import type { UnifiedParseResult } from '@/lib/types';
 import { ImageNoteGrid } from './ImageNoteGrid';
 import { type MediaPreviewRequest } from './media-preview';
 import { ResultCardHeader } from './ResultCardHeader';
-import { resolveResultDisplayImages } from './result-card-visibility';
+import { getResultMediaActions, resolveResultDisplayImages } from './result-card-visibility';
+import { SinglePartButtons } from './SinglePartButtons';
 
 type ResultData = NonNullable<UnifiedParseResult['data']>;
 
@@ -17,12 +18,28 @@ interface ImageResultPanelProps {
     activePreview?: MediaPreviewRequest | null;
 }
 
-export function ImageResultPanel({ result, onClose }: ImageResultPanelProps) {
+export function ImageResultPanel({
+    result,
+    onClose,
+    onOpenExtractAudio,
+    onRequestPreview,
+}: ImageResultPanelProps) {
     const displayImages = resolveResultDisplayImages({
         noteType: result.noteType,
         images: result.images,
         coverUrl: result.cover,
     });
+
+    // 图文笔记常带一条背景音乐，后端会把它作为可选音轨返回
+    const { audioAction } = getResultMediaActions({
+        videoAudioMode: result.videoAudioMode,
+        mediaActions: result.mediaActions,
+        videoDownloadUrl: result.downloadVideoUrl || result.originDownloadVideoUrl,
+        audioDownloadUrl: result.downloadAudioUrl || result.originDownloadAudioUrl || null,
+        originDownloadVideoUrl: result.originDownloadVideoUrl,
+        originDownloadAudioUrl: result.originDownloadAudioUrl,
+    });
+    const showAudioActions = audioAction !== 'hide';
 
     return (
         <Card>
@@ -34,7 +51,17 @@ export function ImageResultPanel({ result, onClose }: ImageResultPanelProps) {
                 onClose={onClose}
             />
             <CardContent className="px-3 pb-3 pt-0">
-                <ImageNoteGrid images={displayImages} title={result.title} />
+                <div className="space-y-2">
+                    <ImageNoteGrid images={displayImages} title={result.title} />
+                    {showAudioActions ? (
+                        <SinglePartButtons
+                            result={result}
+                            onOpenExtractAudio={onOpenExtractAudio}
+                            onOpenHlsDownload={() => {}}
+                            onRequestPreview={onRequestPreview}
+                        />
+                    ) : null}
+                </div>
             </CardContent>
         </Card>
     );
