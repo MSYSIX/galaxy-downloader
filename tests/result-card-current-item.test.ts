@@ -126,18 +126,20 @@ describe('ResultCard current collection item highlighting', () => {
         onClose: () => {},
         onOpenExtractAudio: () => {},
         onRequestPreview: () => {},
+        onClearPreview: () => {},
       })
     )
 
     expect(html).toContain('合集第2集当前页')
     expect(html).toContain('border-primary bg-primary/5')
-    expect(html).toContain('<video')
-    expect(html).toContain('/api/play?url=')
+    expect(html).not.toContain('<video')
+    expect(html).not.toContain('/api/play?url=')
+    expect(html).toContain('<img')
     expect(html.match(/aria-label="播放视频"/g) ?? []).toHaveLength(1)
     expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(1)
   })
 
-  test('纯音频单流结果显示默认播放器和分享，但不显示切换按钮', () => {
+  test('纯音频单流结果默认显示封面和单独的播放音频按钮', () => {
     const result = {
       title: '测试音频',
       desc: 'audio only',
@@ -158,16 +160,18 @@ describe('ResultCard current collection item highlighting', () => {
         onClose: () => {},
         onOpenExtractAudio: () => {},
         onRequestPreview: () => {},
+        onClearPreview: () => {},
       })
     )
 
-    expect(html).toContain('<audio')
+    expect(html).not.toContain('<audio')
+    expect(html).toContain('<img')
     expect(html).toContain('>分享<')
     expect(html.match(/aria-label="播放视频"/g) ?? []).toHaveLength(0)
-    expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(0)
+    expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(1)
   })
 
-  test('muxed 单流结果显示默认视频播放器和分享，但不显示切换按钮', () => {
+  test('muxed 单流结果默认显示封面和单独的播放视频按钮', () => {
     const result = {
       title: '测试视频',
       desc: 'muxed video',
@@ -188,12 +192,49 @@ describe('ResultCard current collection item highlighting', () => {
         onClose: () => {},
         onOpenExtractAudio: () => {},
         onRequestPreview: () => {},
+        onClearPreview: () => {},
+      })
+    )
+
+    expect(html).not.toContain('<video')
+    expect(html).toContain('<img')
+    expect(html).toContain('>分享<')
+    expect(html.match(/aria-label="播放视频"/g) ?? []).toHaveLength(1)
+    expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(0)
+  })
+
+  test('用户选择视频播放后才渲染播放器', () => {
+    const result = {
+      title: '测试视频',
+      cover: 'https://img.example.com/video-cover.jpg',
+      platform: 'bili',
+      url: 'https://www.bilibili.com/video/BV1muxed/',
+      downloadAudioUrl: null,
+      downloadVideoUrl: 'https://cdn.example.com/video.mp4',
+      originDownloadAudioUrl: null,
+      originDownloadVideoUrl: null,
+      videoAudioMode: 'muxed' as const,
+      mediaActions: { video: 'direct-download', audio: 'extract-audio' } as const,
+    }
+
+    const html = renderToStaticMarkup(
+      React.createElement(ResultCard, {
+        result,
+        onClose: () => {},
+        onOpenExtractAudio: () => {},
+        onRequestPreview: () => {},
+        onClearPreview: () => {},
+        activePreview: {
+          mediaType: 'video',
+          sourceUrl: result.url,
+          title: result.title,
+          autoplay: true,
+        },
       })
     )
 
     expect(html).toContain('<video')
-    expect(html).toContain('>分享<')
-    expect(html.match(/aria-label="播放视频"/g) ?? []).toHaveLength(0)
-    expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(0)
+    expect(html).toContain('/api/play?url=')
+    expect(html).toContain('autoPlay=""')
   })
 })

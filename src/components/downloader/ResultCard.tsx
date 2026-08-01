@@ -25,6 +25,7 @@ interface ResultCardProps {
     onClose: () => void;
     onOpenExtractAudio: (task: AudioExtractTask) => void;
     onRequestPreview: (request: MediaPreviewRequest) => void;
+    onClearPreview: () => void;
     activePreview?: MediaPreviewRequest | null;
 }
 
@@ -33,15 +34,16 @@ export function ResultCard({
     onClose,
     onOpenExtractAudio,
     onRequestPreview,
+    onClearPreview,
     activePreview,
 }: ResultCardProps) {
     if (!result) return null;
 
     const kind = resolveResultKind(result);
-    const panelProps = { result, onClose, onOpenExtractAudio, onRequestPreview, activePreview };
-
-    if (kind === 'picker') return <PodcastPickerPanel {...panelProps} />;
-    if (kind === 'audio') return <AudioResultPanel {...panelProps} />;
-    if (kind === 'image') return <ImageResultPanel {...panelProps} />;
-    return <VideoResultPanel {...panelProps} />;
+    if (kind === 'picker') {
+        return <PodcastPickerPanel result={result} onClose={onClose} onOpenExtractAudio={onOpenExtractAudio} onRequestPreview={onRequestPreview} onClearPreview={onClearPreview} activePreview={activePreview} />;
+    }
+    if (kind === 'audio') return <AudioResultPanel result={result} onClose={onClose} onOpenExtractAudio={onOpenExtractAudio} onRequestPreview={onRequestPreview} activePreview={activePreview} />;
+    if (kind === 'image') return <ImageResultPanel result={result} onClose={onClose} onOpenExtractAudio={onOpenExtractAudio} onRequestPreview={onRequestPreview} activePreview={activePreview} />;
+    return <VideoResultPanel result={result} onClose={onClose} onOpenExtractAudio={onOpenExtractAudio} onRequestPreview={onRequestPreview} onClearPreview={onClearPreview} activePreview={activePreview} />;
 }

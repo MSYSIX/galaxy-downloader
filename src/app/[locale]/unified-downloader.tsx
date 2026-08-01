@@ -482,6 +482,7 @@ export function UnifiedDownloader({
                                 onCloseParseResult={closeParseResult}
                                 onOpenExtractAudio={openResultAudioExtract}
                                 onRequestPreview={openResultPreview}
+                                onClearPreview={() => setActivePreview(null)}
                                 activePreview={activePreview}
                                 mobileAd={mobileAd}
                                 mobileGuides={mobileGuides}

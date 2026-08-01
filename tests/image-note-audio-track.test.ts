@@ -109,6 +109,7 @@ function render(result: Record<string, unknown>) {
       onClose: () => {},
       onOpenExtractAudio: () => {},
       onRequestPreview: () => {},
+      onClearPreview: () => {},
     })
   )
 }

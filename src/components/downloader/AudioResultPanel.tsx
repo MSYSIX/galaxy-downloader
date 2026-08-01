@@ -36,7 +36,14 @@ export function AudioResultPanel({
     const shareSourceUrl = typeof result.url === 'string' ? result.url.trim() : '';
     const canSharePlayLink = shareSourceUrl.length > 0 && canSharePlayResult(result);
     const primaryPreview = buildPrimaryResultPreview(result, { autoplay: false, preferAudio: true });
-    const playerPreview = primaryPreview
+    const isActivePreviewForResult = Boolean(
+        activePreview
+        && primaryPreview
+        && activePreview.mediaType === primaryPreview.mediaType
+        && activePreview.sourceUrl === primaryPreview.sourceUrl
+        && activePreview.item === primaryPreview.item
+    );
+    const playerPreview = isActivePreviewForResult && primaryPreview
         ? {
               ...primaryPreview,
               autoplay: activePreview?.autoplay ?? primaryPreview.autoplay,

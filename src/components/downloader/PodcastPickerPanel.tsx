@@ -24,6 +24,7 @@ interface PodcastPickerPanelProps {
     onClose: () => void;
     onOpenExtractAudio: (task: AudioExtractTask) => void;
     onRequestPreview: (request: MediaPreviewRequest) => void;
+    onClearPreview: () => void;
     activePreview?: MediaPreviewRequest | null;
 }
 
@@ -32,6 +33,7 @@ export function PodcastPickerPanel({
     onClose,
     onOpenExtractAudio,
     onRequestPreview,
+    onClearPreview,
     activePreview,
 }: PodcastPickerPanelProps) {
     const dict = useDictionary();
@@ -74,7 +76,7 @@ export function PodcastPickerPanel({
             : null;
 
     const effectivePreview =
-        playerPreview &&
+        playerPreview && activePreview?.mediaType === 'audio' &&
         activePreview?.sourceUrl === shareSourceUrl &&
         activePreview?.item === selectedEpisode?.id
             ? activePreview
@@ -88,15 +90,7 @@ export function PodcastPickerPanel({
 
     const handleSelectEpisode = (episodeId: string) => {
         setSelectedEpisodeId(episodeId);
-        if (shareSourceUrl) {
-            onRequestPreview({
-                mediaType: 'audio',
-                sourceUrl: shareSourceUrl,
-                title: episodes.find((e) => e.id === episodeId)?.title ?? '',
-                item: episodeId,
-                autoplay: false,
-            });
-        }
+        onClearPreview();
     };
 
     const handleCopySharePlayLink = async () => {

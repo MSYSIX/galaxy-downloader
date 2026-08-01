@@ -61,11 +61,8 @@ export function SinglePartButtons({
     const showVideoDownload = videoAction === 'direct-download' || videoAction === 'merge-then-download';
     const showBrowserHlsDownload = videoAction === 'browser-hls-download' || (videoAction === 'hide' && isHlsPlaylistUrl(result.originDownloadVideoUrl));
     const showAudioDownload = audioAction !== 'hide';
-    const canSwitchPreview = previewSourceUrl.length > 0
-        && canPreviewResultVideo(result)
-        && canPreviewResultAudio(result);
-    const showVideoPreview = canSwitchPreview;
-    const showAudioPreview = canSwitchPreview;
+    const showVideoPreview = previewSourceUrl.length > 0 && canPreviewResultVideo(result);
+    const showAudioPreview = previewSourceUrl.length > 0 && canPreviewResultAudio(result);
     const showOriginVideoLink =
         typeof result.originDownloadVideoUrl === 'string'
         && result.originDownloadVideoUrl.length > 0
@@ -126,6 +123,7 @@ export function SinglePartButtons({
                                     sourceUrl: previewSourceUrl,
                                     title: previewTitle,
                                     item: previewItem,
+                                    autoplay: true,
                                 })}
                             />
                         )}
@@ -140,6 +138,7 @@ export function SinglePartButtons({
                                     sourceUrl: previewSourceUrl,
                                     title: previewTitle,
                                     item: previewItem,
+                                    autoplay: true,
                                 })}
                             />
                         )}

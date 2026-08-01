@@ -18,6 +18,7 @@ interface UnifiedDownloaderLowerSectionsProps {
     onCloseParseResult: () => void;
     onOpenExtractAudio: (task: AudioExtractTask) => void;
     onRequestPreview: (request: MediaPreviewRequest) => void;
+    onClearPreview: () => void;
     activePreview?: MediaPreviewRequest | null;
     mobileAd?: ReactNode;
     mobileGuides?: ReactNode;
@@ -33,6 +34,7 @@ export function UnifiedDownloaderLowerSections({
     onCloseParseResult,
     onOpenExtractAudio,
     onRequestPreview,
+    onClearPreview,
     activePreview,
     mobileAd,
     mobileGuides,
@@ -52,6 +54,7 @@ export function UnifiedDownloaderLowerSections({
                     onClose={onCloseParseResult}
                     onOpenExtractAudio={onOpenExtractAudio}
                     onRequestPreview={onRequestPreview}
+                    onClearPreview={onClearPreview}
                     activePreview={activePreview}
                 />
             )}

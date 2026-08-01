@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { AudioExtractTask } from '@/components/audio-tool/types';
 import { DeferredHlsDownloadDialog } from '@/components/deferred-hls-download-dialog';
@@ -95,6 +95,7 @@ interface VideoResultPanelProps {
     onClose: () => void;
     onOpenExtractAudio: (task: AudioExtractTask) => void;
     onRequestPreview: (request: MediaPreviewRequest) => void;
+    onClearPreview: () => void;
     activePreview?: MediaPreviewRequest | null;
 }
 
@@ -103,6 +104,7 @@ export function VideoResultPanel({
     onClose,
     onOpenExtractAudio,
     onRequestPreview,
+    onClearPreview,
     activePreview,
 }: VideoResultPanelProps) {
     const dict = useDictionary();
@@ -180,7 +182,14 @@ export function VideoResultPanel({
     const selectedCoverUrl =
         activeCollectionSource === 'season' && currentVideo?.cover ? currentVideo.cover.trim() : coverUrl;
     const coverSrc = selectedCoverUrl.length > 0 ? resolveCoverSrc(selectedCoverUrl) : '';
-    const playerPreview = primaryPreview
+    const isActivePreviewForSelection = Boolean(
+        activePreview
+        && primaryPreview
+        && activePreview.mediaType === primaryPreview.mediaType
+        && activePreview.sourceUrl === primaryPreview.sourceUrl
+        && activePreview.item === primaryPreview.item
+    );
+    const playerPreview = isActivePreviewForSelection && primaryPreview
         ? {
               ...primaryPreview,
               autoplay: activePreview?.autoplay ?? primaryPreview.autoplay,
@@ -205,22 +214,6 @@ export function VideoResultPanel({
                 ? currentVideo?.id
                 : undefined;
 
-    useEffect(() => {
-        if (!activePreview || !primaryPreview) return;
-        if (activePreview.sourceUrl !== primaryPreview.sourceUrl) return;
-        if (
-            activePreview.mediaType === primaryPreview.mediaType &&
-            activePreview.item === primaryPreview.item &&
-            activePreview.sourceUrl === primaryPreview.sourceUrl
-        ) {
-            return;
-        }
-        onRequestPreview({
-            ...primaryPreview,
-            autoplay: activePreview.autoplay ?? primaryPreview.autoplay,
-        });
-    }, [activePreview, onRequestPreview, primaryPreview]);
-
     const handleSelectPage = (pageNumber: number) => {
         const page = result.pages?.find((item) => item.page === pageNumber);
         if (!page) return;
@@ -229,6 +222,7 @@ export function VideoResultPanel({
             currentPage: pageNumber,
             currentItemId: previous.key === activeListKey ? previous.currentItemId : result.currentItemId,
         }));
+        onClearPreview();
     };
 
     const handleSelectVideo = (itemId: string) => {
@@ -239,6 +233,7 @@ export function VideoResultPanel({
             currentPage: previous.key === activeListKey ? previous.currentPage : result.currentPage,
             currentItemId: itemId,
         }));
+        onClearPreview();
     };
 
     const handleCopySharePlayLink = async () => {
