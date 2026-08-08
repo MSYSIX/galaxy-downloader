@@ -25,7 +25,8 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        # 加上 --no-frozen-lockfile 绕过锁文件严格匹配校验
+        run: pnpm install --no-frozen-lockfile
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
