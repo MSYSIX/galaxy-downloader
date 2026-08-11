@@ -137,6 +137,10 @@ describe('ResultCard current collection item highlighting', () => {
     expect(html).toContain('<img')
     expect(html.match(/aria-label="播放视频"/g) ?? []).toHaveLength(1)
     expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(1)
+    expect(html).toMatch(/aria-label="播放视频: 合集第1集"/)
+    expect(html).toMatch(/aria-label="播放音频: 合集第1集"/)
+    expect(html).toMatch(/aria-label="播放视频: 合集第2集当前页"/)
+    expect(html).toMatch(/aria-label="播放音频: 合集第2集当前页"/)
   })
 
   test('B站合集返回 kind: picker 但没有 episodes 时仍渲染合集列表', () => {
@@ -184,6 +188,78 @@ describe('ResultCard current collection item highlighting', () => {
 
     expect(html).toContain('合集第1集')
     expect(html).toContain('合集第2集当前页')
+    expect(html).toContain('border-primary bg-primary/5')
+  })
+
+  test('同时包含分P和合集时默认显示分P并统一提供四种文字操作', () => {
+    const result = {
+      title: '双形态视频',
+      cover: 'https://img.example.com/cover.jpg',
+      platform: 'bili',
+      url: 'https://www.bilibili.com/video/BV-source/',
+      kind: 'picker' as const,
+      downloadAudioUrl: '/api/download?type=audio&item=1',
+      downloadVideoUrl: '/api/download?type=video&item=1',
+      originDownloadAudioUrl: null,
+      originDownloadVideoUrl: null,
+      videoAudioMode: 'muxed' as const,
+      mediaActions: { video: 'direct-download', audio: 'direct-download' } as const,
+      isMultiPart: true,
+      currentPage: 1,
+      currentItemId: 'BV-source',
+      pages: [
+        {
+          page: 1,
+          cid: 'cid-1',
+          part: 'P1 正片',
+          duration: 120,
+          downloadVideoUrl: '/api/download?type=video&item=1',
+          downloadAudioUrl: '/api/download?type=audio&item=1',
+          videoAudioMode: 'muxed' as const,
+        },
+        {
+          page: 2,
+          cid: 'cid-2',
+          part: 'P2 花絮',
+          duration: 60,
+          downloadVideoUrl: '/api/download?type=video&item=2',
+          downloadAudioUrl: '/api/download?type=audio&item=2',
+        },
+      ],
+      videos: [
+        {
+          id: 'BV-season-1',
+          title: '合集第1集',
+          downloadVideoUrl: '/api/download?type=video&item=BV-season-1',
+          downloadAudioUrl: '/api/download?type=audio&item=BV-season-1',
+        },
+        {
+          id: 'BV-source',
+          title: '合集当前集',
+          downloadVideoUrl: '/api/download?type=video&item=BV-source',
+          downloadAudioUrl: '/api/download?type=audio&item=BV-source',
+        },
+      ],
+    }
+
+    const html = renderToStaticMarkup(
+      React.createElement(ResultCard, {
+        result,
+        onClose: () => {},
+        onOpenExtractAudio: () => {},
+        onRequestPreview: () => {},
+        onClearPreview: () => {},
+      })
+    )
+
+    expect(html).toContain('P1 正片')
+    expect(html).toContain('P2 花絮')
+    expect(html).not.toContain('合集当前集')
+    expect(html).not.toContain('role="button"')
+    expect(html).toMatch(/aria-label="播放视频: P1 正片"/)
+    expect(html).toMatch(/aria-label="播放音频: P1 正片"/)
+    expect(html).toMatch(/aria-label="下载视频: P1 正片"/)
+    expect(html).toMatch(/aria-label="下载音频: P1 正片"/)
     expect(html).toContain('border-primary bg-primary/5')
   })
 

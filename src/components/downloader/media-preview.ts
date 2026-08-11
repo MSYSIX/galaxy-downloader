@@ -1,7 +1,7 @@
 import { API_ENDPOINTS } from '@/lib/config'
 import type { EmbeddedVideoInfo, PageInfo, PodcastEpisodeInfo, UnifiedParseResult } from '@/lib/types'
 
-import { getResultMediaActions, shouldShowVideoDownloadButton } from './result-card-visibility'
+import { getResultMediaActions, hasSourceUrl, shouldShowVideoDownloadButton } from './result-card-visibility'
 
 export type PreviewMediaType = 'video' | 'audio'
 
@@ -15,10 +15,6 @@ export interface MediaPreviewRequest {
 }
 
 type ParsedResultData = NonNullable<UnifiedParseResult['data']>
-
-function hasSourceUrl(url: string | null | undefined): url is string {
-    return typeof url === 'string' && url.trim().length > 0
-}
 
 export function buildMediaPreviewUrl(request: MediaPreviewRequest): string {
     const params = new URLSearchParams({
@@ -37,8 +33,11 @@ export function canPreviewResultVideo(result: ParsedResultData): boolean {
     const videoDownloadUrl = result.downloadVideoUrl || result.originDownloadVideoUrl || null
     const audioDownloadUrl = result.downloadAudioUrl || result.originDownloadAudioUrl || null
     const { videoAction } = getResultMediaActions({
+        videoAudioMode: result.videoAudioMode,
         videoDownloadUrl,
         audioDownloadUrl,
+        originDownloadVideoUrl: result.originDownloadVideoUrl,
+        originDownloadAudioUrl: result.originDownloadAudioUrl,
         mediaActions: result.mediaActions,
     })
 
@@ -49,8 +48,11 @@ export function canPreviewResultAudio(result: ParsedResultData): boolean {
     const videoDownloadUrl = result.downloadVideoUrl || result.originDownloadVideoUrl || null
     const audioDownloadUrl = result.downloadAudioUrl || result.originDownloadAudioUrl || null
     const { audioAction } = getResultMediaActions({
+        videoAudioMode: result.videoAudioMode,
         videoDownloadUrl,
         audioDownloadUrl,
+        originDownloadVideoUrl: result.originDownloadVideoUrl,
+        originDownloadAudioUrl: result.originDownloadAudioUrl,
         mediaActions: result.mediaActions,
     })
 
@@ -183,27 +185,34 @@ export function buildEmbeddedVideoPreview(
 }
 
 export function canPreviewPageVideo(page: PageInfo): boolean {
-    if (!shouldShowVideoDownloadButton(page.downloadVideoUrl)) {
-        return false
-    }
+    const { videoAction } = getResultMediaActions({
+        videoAudioMode: page.videoAudioMode,
+        videoDownloadUrl: page.downloadVideoUrl,
+        audioDownloadUrl: page.downloadAudioUrl,
+    })
 
-    if (page.videoAudioMode === 'muxed') {
-        return true
-    }
-
-    return !hasSourceUrl(page.downloadAudioUrl)
+    return videoAction === 'direct-download' && shouldShowVideoDownloadButton(page.downloadVideoUrl)
 }
 
 export function canPreviewPageAudio(page: PageInfo): boolean {
-    return hasSourceUrl(page.downloadAudioUrl)
+    const { audioAction } = getResultMediaActions({
+        videoAudioMode: page.videoAudioMode,
+        videoDownloadUrl: page.downloadVideoUrl,
+        audioDownloadUrl: page.downloadAudioUrl,
+    })
+
+    return audioAction === 'direct-download' && hasSourceUrl(page.downloadAudioUrl)
 }
 
 export function canPreviewEmbeddedVideoVideo(video: EmbeddedVideoInfo): boolean {
     const videoDownloadUrl = video.downloadVideoUrl || video.originDownloadVideoUrl || null
     const audioDownloadUrl = video.downloadAudioUrl || video.originDownloadAudioUrl || null
     const { videoAction } = getResultMediaActions({
+        videoAudioMode: video.videoAudioMode,
         videoDownloadUrl,
         audioDownloadUrl,
+        originDownloadVideoUrl: video.originDownloadVideoUrl,
+        originDownloadAudioUrl: video.originDownloadAudioUrl,
         mediaActions: video.mediaActions,
     })
 
@@ -237,10 +246,96 @@ export function canPreviewEmbeddedVideoAudio(video: EmbeddedVideoInfo): boolean 
     const videoDownloadUrl = video.downloadVideoUrl || video.originDownloadVideoUrl || null
     const audioDownloadUrl = video.downloadAudioUrl || video.originDownloadAudioUrl || null
     const { audioAction } = getResultMediaActions({
+        videoAudioMode: video.videoAudioMode,
         videoDownloadUrl,
         audioDownloadUrl,
+        originDownloadVideoUrl: video.originDownloadVideoUrl,
+        originDownloadAudioUrl: video.originDownloadAudioUrl,
         mediaActions: video.mediaActions,
     })
 
     return audioAction === 'direct-download' && hasSourceUrl(audioDownloadUrl)
+}
+
+export function buildResultPreviewForSelection(
+    result: ParsedResultData,
+    options: {
+        item?: string
+        mediaType?: PreviewMediaType
+        autoplay?: boolean
+    } = {}
+): MediaPreviewRequest | null {
+    const sourceUrl = result.url.trim()
+    if (!sourceUrl) {
+        return null
+    }
+
+    const buildExactPreview = (
+        mediaType: PreviewMediaType,
+        title: string,
+        item: string | undefined,
+        canPreview: boolean
+    ): MediaPreviewRequest | null => canPreview
+        ? {
+              mediaType,
+              sourceUrl,
+              title,
+              item,
+              autoplay: options.autoplay,
+          }
+        : null
+
+    if (options.item) {
+        const page = result.pages?.find((candidate) => String(candidate.page) === options.item)
+        if (page) {
+            if (!options.mediaType) {
+                return buildPagePreview(sourceUrl, page, { autoplay: options.autoplay })
+            }
+
+            return buildExactPreview(
+                options.mediaType,
+                page.part,
+                String(page.page),
+                options.mediaType === 'video' ? canPreviewPageVideo(page) : canPreviewPageAudio(page)
+            )
+        }
+
+        const video = result.videos?.find((candidate) => candidate.id === options.item)
+        if (video) {
+            if (!options.mediaType) {
+                return buildEmbeddedVideoPreview(sourceUrl, video, { autoplay: options.autoplay })
+            }
+
+            return buildExactPreview(
+                options.mediaType,
+                video.title,
+                video.id,
+                options.mediaType === 'video'
+                    ? canPreviewEmbeddedVideoVideo(video)
+                    : canPreviewEmbeddedVideoAudio(video)
+            )
+        }
+
+        const episode = result.episodes?.find((candidate) => candidate.id === options.item)
+        if (episode) {
+            if (options.mediaType && options.mediaType !== 'audio') {
+                return null
+            }
+
+            return buildEpisodePreview(sourceUrl, episode, { autoplay: options.autoplay })
+        }
+
+        return null
+    }
+
+    if (!options.mediaType) {
+        return buildPrimaryResultPreview(result, { autoplay: options.autoplay })
+    }
+
+    return buildExactPreview(
+        options.mediaType,
+        result.title,
+        undefined,
+        options.mediaType === 'video' ? canPreviewResultVideo(result) : canPreviewResultAudio(result)
+    )
 }

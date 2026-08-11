@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+    buildEmbeddedVideoPreview,
+    buildPagePreview,
     buildPrimaryResultPreview,
+    buildResultPreviewForSelection,
+    canPreviewEmbeddedVideoAudio,
+    canPreviewEmbeddedVideoVideo,
+    canPreviewPageAudio,
+    canPreviewPageVideo,
     canPreviewResultAudio,
     canPreviewResultVideo,
     canSharePlayResult,
@@ -20,7 +27,7 @@ it('keeps share play enabled for audio-only results', () => {
         mediaActions: {
             video: 'hide',
             audio: 'direct-download',
-        },
+        } as const,
     }
 
     expect(canPreviewResultVideo(result)).toBe(false)
@@ -55,5 +62,109 @@ it('keeps share play enabled for muxed video results without a separate audio st
         title: 'Muxed video',
         autoplay: undefined,
     })
+})
+
+it('builds an audio preview for a collection item when audio is preferred', () => {
+    const video = {
+        id: 'BV1audio',
+        title: 'Collection item',
+        downloadVideoUrl: '/api/download?type=video&item=BV1audio',
+        downloadAudioUrl: '/api/download?type=audio&item=BV1audio',
+    }
+
+    expect(buildEmbeddedVideoPreview(
+        'https://www.bilibili.com/video/BV1audio/',
+        video,
+        { autoplay: true, preferAudio: true }
+    )).toEqual({
+        mediaType: 'audio',
+        sourceUrl: 'https://www.bilibili.com/video/BV1audio/',
+        title: 'Collection item',
+        item: 'BV1audio',
+        autoplay: true,
+    })
+})
+
+it('uses the same media capability resolver for pages and collection videos', () => {
+    const separatePage = {
+        page: 2,
+        cid: 'cid-2',
+        part: 'Separate page',
+        duration: 20,
+        downloadVideoUrl: '/api/download?type=video&item=2',
+        downloadAudioUrl: '/api/download?type=audio&item=2',
+        videoAudioMode: 'separate' as const,
+    }
+    const separateVideo = {
+        id: 'BV-separate',
+        title: 'Separate collection item',
+        downloadVideoUrl: '/api/download?type=video&item=BV-separate',
+        downloadAudioUrl: '/api/download?type=audio&item=BV-separate',
+        videoAudioMode: 'separate' as const,
+    }
+
+    expect(canPreviewPageVideo(separatePage)).toBe(false)
+    expect(canPreviewPageAudio(separatePage)).toBe(true)
+    expect(canPreviewEmbeddedVideoVideo(separateVideo)).toBe(false)
+    expect(canPreviewEmbeddedVideoAudio(separateVideo)).toBe(true)
+    expect(buildPagePreview('https://www.bilibili.com/video/BV-pages/', separatePage)).toMatchObject({
+        mediaType: 'audio',
+        item: '2',
+    })
+})
+
+it('keeps unknown item modes usable when both validated stream urls exist', () => {
+    const page = {
+        page: 3,
+        cid: 'cid-3',
+        part: 'Legacy page',
+        duration: 30,
+        downloadVideoUrl: '/api/download?type=video&item=3',
+        downloadAudioUrl: '/api/download?type=audio&item=3',
+    }
+
+    expect(canPreviewPageVideo(page)).toBe(true)
+    expect(canPreviewPageAudio(page)).toBe(true)
+})
+
+it('resolves an explicitly shared item and never falls back to another media type', () => {
+    const result = {
+        title: 'Multipart result',
+        platform: 'bili',
+        url: 'https://www.bilibili.com/video/BV-pages/',
+        downloadAudioUrl: null,
+        downloadVideoUrl: '/api/download?type=video',
+        originDownloadAudioUrl: null,
+        originDownloadVideoUrl: null,
+        pages: [{
+            page: 2,
+            cid: 'cid-2',
+            part: 'Audio-capable page',
+            duration: 20,
+            downloadVideoUrl: '/api/download?type=video&item=2',
+            downloadAudioUrl: '/api/download?type=audio&item=2',
+            videoAudioMode: 'separate' as const,
+        }],
+    }
+
+    expect(buildResultPreviewForSelection(result, {
+        item: '2',
+        mediaType: 'audio',
+        autoplay: true,
+    })).toEqual({
+        mediaType: 'audio',
+        sourceUrl: result.url,
+        title: 'Audio-capable page',
+        item: '2',
+        autoplay: true,
+    })
+    expect(buildResultPreviewForSelection(result, {
+        item: '2',
+        mediaType: 'video',
+    })).toBeNull()
+    expect(buildResultPreviewForSelection(result, {
+        item: 'missing',
+        mediaType: 'audio',
+    })).toBeNull()
 })
 })

@@ -12,7 +12,7 @@ import { DeferredAudioExtractDialog } from '@/components/deferred-audio-extract-
 import { useTopBarActions } from '@/components/layout/top-bar-actions';
 import type { AudioExtractTask } from '@/components/audio-tool/types';
 import type { MediaPreviewRequest } from '@/components/downloader/media-preview';
-import { buildPrimaryResultPreview } from '@/components/downloader/media-preview';
+import { buildResultPreviewForSelection } from '@/components/downloader/media-preview';
 import { ArrowUp, Loader2, X } from 'lucide-react';
 
 import type { DownloadRecord } from './download-history';
@@ -41,7 +41,7 @@ interface UnifiedDownloaderProps {
 }
 
 interface ActivePreview extends MediaPreviewRequest {
-    origin: 'share' | 'result';
+    origin: 'share' | 'result' | 'user';
 }
 
 export function UnifiedDownloader({
@@ -162,7 +162,7 @@ export function UnifiedDownloader({
         setActivePreview({
             ...request,
             autoplay: request.autoplay ?? false,
-            origin: 'result',
+            origin: request.origin ?? 'result',
         });
     }, []);
 
@@ -229,6 +229,12 @@ export function UnifiedDownloader({
 
     const sharedPlaySourceUrl = searchParams.get('play')?.trim() ?? '';
     const sharedAutoplayRequested = searchParams.get('autoplay') === '1';
+    const sharedPlayItem = searchParams.get('item')?.trim() || undefined;
+    const sharedPlayType = searchParams.get('type') === 'audio'
+        ? 'audio'
+        : searchParams.get('type') === 'video'
+            ? 'video'
+            : undefined;
     const hasDownloadHistory = downloadHistory.length > 0;
     const showHistoryShortcut = historyHydrated && hasDownloadHistory;
     const scrollToHistory = useCallback(() => {
@@ -261,7 +267,12 @@ export function UnifiedDownloader({
             return;
         }
 
-        const taskKey = `${sharedPlaySourceUrl}::${sharedAutoplayRequested ? '1' : '0'}`;
+        const taskKey = [
+            sharedPlaySourceUrl,
+            sharedPlayItem ?? '',
+            sharedPlayType ?? '',
+            sharedAutoplayRequested ? '1' : '0',
+        ].join('::');
         if (handledShareTaskRef.current === taskKey) {
             return;
         }
@@ -282,7 +293,9 @@ export function UnifiedDownloader({
                     return;
                 }
 
-                const sharePreview = buildPrimaryResultPreview(parsed, {
+                const sharePreview = buildResultPreviewForSelection(parsed, {
+                    item: sharedPlayItem,
+                    mediaType: sharedPlayType,
                     autoplay: sharedAutoplayRequested,
                 });
 
@@ -325,7 +338,14 @@ export function UnifiedDownloader({
         return () => {
             cancelled = true;
         };
-    }, [dict, handleUnifiedParse, sharedAutoplayRequested, sharedPlaySourceUrl]);
+    }, [
+        dict,
+        handleUnifiedParse,
+        sharedAutoplayRequested,
+        sharedPlayItem,
+        sharedPlaySourceUrl,
+        sharedPlayType,
+    ]);
 
     useEffect(() => {
         let idleId: number | null = null;

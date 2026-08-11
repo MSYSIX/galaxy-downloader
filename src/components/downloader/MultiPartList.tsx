@@ -3,11 +3,11 @@ import { useDictionary } from '@/i18n/client';
 import type { PageInfo } from '@/lib/types';
 import { formatDuration } from '@/lib/utils';
 
-import { MediaActionIconButton } from './MediaActionIconButton';
+import { CollectionItemActions, type CollectionPreviewMediaType } from './CollectionItemActions';
+import { canPreviewPageAudio, canPreviewPageVideo } from './media-preview';
 import { LOAD_MORE_BATCH, useChunkedMobileList } from './use-chunked-mobile-list';
 import { replaceTemplate } from './result-card-utils';
 import { useTemporaryDownloadKeys } from './use-temporary-download-keys';
-import { VideoDownloadIcon, AudioDownloadIcon } from './CustomIcons';
 
 const DEFAULT_VISIBLE_PARTS = 100;
 
@@ -18,7 +18,7 @@ export function MultiPartList({
 }: {
     pages: PageInfo[];
     currentPage?: number;
-    onSelectPage?: (page: number) => void;
+    onSelectPage?: (page: number, mediaType: CollectionPreviewMediaType) => void;
 }) {
     const dict = useDictionary();
     const { loadingKeys, triggerDownload } = useTemporaryDownloadKeys();
@@ -41,66 +41,49 @@ export function MultiPartList({
             </div>
             <div className="max-h-[min(56vh,26rem)] md:max-h-[min(60vh,32rem)] overflow-y-auto overscroll-contain pr-1">
                 <div className="space-y-2 pr-2">
-                    {visiblePages.map((page) => (
-                        <div
-                            key={page.page}
-                            className={`flex w-full max-w-full flex-col gap-2 overflow-hidden rounded-lg border p-2 text-left transition-colors md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-2 md:p-3 ${
-                                page.page === currentPage
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border hover:bg-muted/50'
-                            }`}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => onSelectPage?.(page.page)}
-                            onKeyDown={(event) => {
-                                if (event.key === 'Enter' || event.key === ' ') {
-                                    event.preventDefault();
-                                    onSelectPage?.(page.page);
-                                }
-                            }}
-                        >
-                            <div className="flex w-full items-start gap-2 min-w-0 overflow-hidden">
-                                <span className="text-xs font-medium text-foreground/70 shrink-0">
-                                    P{page.page}
-                                </span>
-                                <div className="flex w-full items-center gap-2 flex-1 min-w-0 overflow-hidden">
-                                    <div className="text-[13px] truncate min-w-0 flex-1 max-w-[64vw] sm:max-w-none" title={page.part}>
-                                        {page.part}
-                                    </div>
-                                    <span className="text-xs text-foreground/65 shrink-0">
-                                        {formatDuration(page.duration)}
-                                    </span>
-                                </div>
-                            </div>
+                    {visiblePages.map((page) => {
+                        const displayTitle = page.part?.trim() || `P${page.page}`;
+                        const videoKey = `${page.page}-video`;
+                        const audioKey = `${page.page}-audio`;
+
+                        return (
                             <div
-                                className="grid w-full gap-2 md:min-w-[11rem] md:grid-cols-2 md:shrink-0"
-                                onClick={(event) => event.stopPropagation()}
+                                key={page.page}
+                                className={`flex w-full max-w-full flex-col gap-2 overflow-hidden rounded-lg border p-2 text-left transition-colors md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-2 md:p-3 ${
+                                    page.page === currentPage
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-border hover:bg-muted/50'
+                                }`}
+                                style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 112px' }}
                             >
-                                {page.downloadVideoUrl && (
-                                    <MediaActionIconButton
-                                        label={dict.result.downloadVideo}
-                                        icon={VideoDownloadIcon}
-                                        variant="default"
-                                        className="w-full"
-                                        disabled={loadingKeys.has(`${page.page}-video`)}
-                                        loading={loadingKeys.has(`${page.page}-video`)}
-                                        onClick={() => triggerDownload(page.downloadVideoUrl!, `${page.page}-video`)}
-                                    />
-                                )}
-                                {page.downloadAudioUrl && (
-                                    <MediaActionIconButton
-                                        label={dict.result.downloadAudio}
-                                        icon={AudioDownloadIcon}
-                                        variant="default"
-                                        className="w-full"
-                                        disabled={loadingKeys.has(`${page.page}-audio`)}
-                                        loading={loadingKeys.has(`${page.page}-audio`)}
-                                        onClick={() => triggerDownload(page.downloadAudioUrl!, `${page.page}-audio`)}
-                                    />
-                                )}
+                                <div className="flex w-full items-start gap-2 min-w-0 overflow-hidden">
+                                    <span className="text-xs font-medium text-foreground/70 shrink-0">
+                                        P{page.page}
+                                    </span>
+                                    <div className="flex w-full items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                        <div className="text-[13px] truncate min-w-0 flex-1 max-w-[64vw] sm:max-w-none" title={displayTitle}>
+                                            {displayTitle}
+                                        </div>
+                                        <span className="text-xs text-foreground/65 shrink-0">
+                                            {formatDuration(page.duration)}
+                                        </span>
+                                    </div>
+                                </div>
+                                <CollectionItemActions
+                                    title={displayTitle}
+                                    canPlayVideo={canPreviewPageVideo(page)}
+                                    canPlayAudio={canPreviewPageAudio(page)}
+                                    videoDownloadUrl={page.downloadVideoUrl}
+                                    audioDownloadUrl={page.downloadAudioUrl}
+                                    videoLoading={loadingKeys.has(videoKey)}
+                                    audioLoading={loadingKeys.has(audioKey)}
+                                    onPlay={(mediaType) => onSelectPage?.(page.page, mediaType)}
+                                    onDownloadVideo={(url) => triggerDownload(url, videoKey)}
+                                    onDownloadAudio={(url) => triggerDownload(url, audioKey)}
+                                />
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {isMobile && (remainingCount > 0 || canCollapseMobile) && (
                         <div className="rounded-lg border border-border/70 p-2">
                             {remainingCount > 0 ? (
