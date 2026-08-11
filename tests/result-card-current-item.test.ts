@@ -139,6 +139,54 @@ describe('ResultCard current collection item highlighting', () => {
     expect(html.match(/aria-label="播放音频"/g) ?? []).toHaveLength(1)
   })
 
+  test('B站合集返回 kind: picker 但没有 episodes 时仍渲染合集列表', () => {
+    const result = {
+      title: '测试合集',
+      cover: 'https://img.example.com/cover.jpg',
+      platform: 'bili',
+      url: 'https://www.bilibili.com/video/BV1ab411c7nA/',
+      kind: 'picker' as const,
+      downloadAudioUrl: '/api/download?type=audio&item=BV2',
+      downloadVideoUrl: '/api/download?type=video&item=BV2',
+      originDownloadAudioUrl: null,
+      originDownloadVideoUrl: null,
+      mediaActions: { video: 'direct-download', audio: 'direct-download' } as const,
+      duration: 123,
+      isMultiPart: false,
+      currentItemId: 'BV2',
+      videos: [
+        {
+          id: 'BV1',
+          title: '合集第1集',
+          duration: 111,
+          downloadVideoUrl: '/api/download?type=video&item=BV1',
+          downloadAudioUrl: '/api/download?type=audio&item=BV1',
+        },
+        {
+          id: 'BV2',
+          title: '合集第2集当前页',
+          duration: 123,
+          downloadVideoUrl: '/api/download?type=video&item=BV2',
+          downloadAudioUrl: '/api/download?type=audio&item=BV2',
+        },
+      ],
+    }
+
+    const html = renderToStaticMarkup(
+      React.createElement(ResultCard, {
+        result,
+        onClose: () => {},
+        onOpenExtractAudio: () => {},
+        onRequestPreview: () => {},
+        onClearPreview: () => {},
+      })
+    )
+
+    expect(html).toContain('合集第1集')
+    expect(html).toContain('合集第2集当前页')
+    expect(html).toContain('border-primary bg-primary/5')
+  })
+
   test('纯音频单流结果默认显示封面和单独的播放音频按钮', () => {
     const result = {
       title: '测试音频',
