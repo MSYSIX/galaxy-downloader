@@ -41,7 +41,8 @@ export function canPreviewResultVideo(result: ParsedResultData): boolean {
         mediaActions: result.mediaActions,
     })
 
-    return videoAction === 'direct-download' && shouldShowVideoDownloadButton(videoDownloadUrl)
+    return (videoAction === 'direct-download' || videoAction === 'browser-hls-download')
+        && shouldShowVideoDownloadButton(videoDownloadUrl)
 }
 
 export function canPreviewResultAudio(result: ParsedResultData): boolean {

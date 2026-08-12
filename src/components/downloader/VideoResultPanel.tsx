@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { HlsVideoPlayer } from '@/components/hls-video-player';
 import { useDictionary } from '@/i18n/client';
 import { toast } from '@/lib/deferred-toast';
-import { buildHlsPlayProxyUrl, HLS_PLAYLIST_ACCEPT, isHlsPlaylistUrl } from '@/lib/hls-playback';
+import { isHlsPlaylistUrl } from '@/lib/hls-playback';
 import type { UnifiedParseResult } from '@/lib/types';
 
 import { EmbeddedVideoList } from './EmbeddedVideoList';
@@ -213,12 +213,12 @@ export function VideoResultPanel({
           }
         : null;
     const hlsPlaybackUrl =
-        playerPreview?.mediaType === 'video' && isHlsPlaylistUrl(effectiveResult.originDownloadVideoUrl)
-            ? buildHlsPlayProxyUrl(
-                  effectiveResult.originDownloadVideoUrl,
-                  effectiveResult.url || effectiveResult.originDownloadVideoUrl,
-                  HLS_PLAYLIST_ACCEPT
-              )
+        playerPreview?.mediaType === 'video'
+        && (
+            effectiveResult.mediaActions?.video === 'browser-hls-download'
+            || isHlsPlaylistUrl(effectiveResult.originDownloadVideoUrl)
+        )
+            ? effectiveResult.downloadVideoUrl
             : null;
     const playerUrl = hlsPlaybackUrl || (playerPreview ? buildMediaPreviewUrl(playerPreview) : null);
     const handleSelectPage = (pageNumber: number, mediaType: 'video' | 'audio') => {

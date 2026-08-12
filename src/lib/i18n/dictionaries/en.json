@@ -251,7 +251,7 @@
         "statusMerging": "Merging…"
     },
     "hlsDownload": {
-        "description": "Try direct HLS segment fetches in the browser first. Only failed requests fall back to the same-origin proxy.",
+        "description": "HLS resources are transferred securely through the download service.",
         "outputTitle": "Output title",
         "outputPlaceholder": "Optional filename prefix",
         "sourceUrl": "Source page or m3u8 URL",

@@ -24,7 +24,7 @@ import { useDictionary } from '@/i18n/client'
 
 export interface HlsDownloadDialogRequest {
     sourceUrl: string
-    refererUrl: string
+    resolvedPlaylistUrl?: string
     title?: string
 }
 
@@ -83,7 +83,7 @@ export function HlsDownloadDialog({
                     >
                         <HlsBrowserDownloadPanel
                             initialSourceUrl={request.sourceUrl}
-                            initialRefererUrl={request.refererUrl}
+                            initialResolvedPlaylistUrl={request.resolvedPlaylistUrl}
                             initialTitle={request.title}
                             autorun
                             onBusyChange={setIsBusy}

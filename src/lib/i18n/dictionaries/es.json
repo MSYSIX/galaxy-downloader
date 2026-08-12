@@ -251,7 +251,7 @@
         "statusMerging": "Fusionando…"
     },
     "hlsDownload": {
-        "description": "Intenta descargar primero los segmentos HLS directamente en el navegador. Solo las solicitudes fallidas usan el proxy del mismo origen.",
+        "description": "Los recursos HLS se transfieren de forma segura mediante el servicio de descarga.",
         "outputTitle": "Título de salida",
         "outputPlaceholder": "Prefijo opcional para el nombre del archivo",
         "sourceUrl": "URL de la página o m3u8",

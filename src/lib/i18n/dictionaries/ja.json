@@ -251,7 +251,7 @@
         "statusMerging": "結合中…"
     },
     "hlsDownload": {
-        "description": "まずブラウザで HLS セグメントを直接取得し、失敗したリクエストだけを同一オリジンのプロキシにフォールバックします。",
+        "description": "HLS リソースはダウンロードサービスを通じて安全に転送されます。",
         "outputTitle": "出力ファイル名",
         "outputPlaceholder": "任意のファイル名プレフィックス",
         "sourceUrl": "元ページまたは m3u8 URL",

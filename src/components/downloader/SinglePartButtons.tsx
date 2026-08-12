@@ -79,13 +79,14 @@ export function SinglePartButtons({
     };
 
     const openBrowserHlsDownload = () => {
-        if (!result.originDownloadVideoUrl) {
+        const workerPlaylistUrl = result.downloadVideoUrl;
+        if (!workerPlaylistUrl) {
             return;
         }
 
         onOpenHlsDownload({
-            sourceUrl: result.originDownloadVideoUrl,
-            refererUrl: result.url || result.originDownloadVideoUrl,
+            sourceUrl: result.url || result.originDownloadVideoUrl || workerPlaylistUrl,
+            resolvedPlaylistUrl: workerPlaylistUrl,
             title: result.title || result.desc || dict.history.unknownTitle,
         });
     };
