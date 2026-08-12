@@ -53,6 +53,18 @@ type DownloadSample = {
     timestamp: number
 }
 
+type SaveFilePickerOptions = {
+    suggestedName?: string
+    types?: Array<{
+        description?: string
+        accept: Record<string, string[]>
+    }>
+}
+
+type FileSystemAccessWindow = Window & {
+    showSaveFilePicker?: (options: SaveFilePickerOptions) => Promise<FileSystemFileHandle>
+}
+
 export interface HlsBrowserDownloadPanelProps {
     initialSourceUrl: string
     initialResolvedPlaylistUrl?: string
@@ -364,6 +376,25 @@ function formatEta(seconds: number): string {
     return [minutes, remainingSeconds].map((value) => String(value).padStart(2, '0')).join(':')
 }
 
+function openSaveFilePicker(
+    fileName: string,
+    extension: string,
+    mimeType: string
+): Promise<FileSystemFileHandle | null> {
+    const browserWindow = window as FileSystemAccessWindow
+    if (!browserWindow.showSaveFilePicker) {
+        return Promise.resolve(null)
+    }
+
+    return browserWindow.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+            description: 'Video files',
+            accept: { [mimeType]: [`.${extension}`] },
+        }],
+    })
+}
+
 export function HlsBrowserDownloadPanel({
     initialSourceUrl,
     initialResolvedPlaylistUrl,
@@ -517,6 +548,9 @@ export function HlsBrowserDownloadPanel({
             const baseTitle = sanitizeFilename(initialTitle || resolution.title || dict.history.unknownTitle)
             const outputName = `${baseTitle || 'hls-browser-download'}-${resolution.selectedSegments.length}-segments.${extension}`
             const mimeType = extension === 'mp4' ? 'video/mp4' : 'video/mp2t'
+            // Must run before the first await so Chromium preserves the click's user activation.
+            const fileHandlePromise = openSaveFilePicker(outputName, extension, mimeType)
+            const fileHandle = await fileHandlePromise
 
             const response = createStreamingDownloadResponse({
                 targets,
@@ -565,7 +599,7 @@ export function HlsBrowserDownloadPanel({
                 fileName: outputName,
                 extensions: [`.${extension}`],
                 mimeTypes: [mimeType],
-            })
+            }, fileHandle, true)
 
             if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
