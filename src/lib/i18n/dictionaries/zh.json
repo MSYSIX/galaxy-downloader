@@ -521,8 +521,7 @@
             "coub": { "name": "Coub", "summary": "短循环视频" },
             "imgur": { "name": "Imgur", "summary": "图片与视频内容" },
             "odysee": { "name": "Odysee", "summary": "视频内容" },
-            "rutube": { "name": "Rutube", "summary": "视频与 HLS 流" },
-            "groups": { "regional": "地区平台", "social": "视频与社交平台", "web": "网页、媒体与音频" }
+            "rutube": { "name": "Rutube", "summary": "视频与 HLS 流" }
         },
         "linkFormats": {
             "title": "支持的链接格式",

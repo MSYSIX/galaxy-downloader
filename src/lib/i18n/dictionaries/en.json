@@ -521,8 +521,7 @@
             "coub": { "name": "Coub", "summary": "Video loops" },
             "imgur": { "name": "Imgur", "summary": "Images and video posts" },
             "odysee": { "name": "Odysee", "summary": "Video posts" },
-            "rutube": { "name": "Rutube", "summary": "Video and HLS streams" },
-            "groups": { "regional": "Regional platforms", "social": "Video and social", "web": "Web, media and audio" }
+            "rutube": { "name": "Rutube", "summary": "Video and HLS streams" }
         },
         "linkFormats": {
             "title": "Supported Link Formats",

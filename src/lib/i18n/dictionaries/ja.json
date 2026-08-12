@@ -521,8 +521,7 @@
             "coub": { "name": "Coub", "summary": "ループ動画" },
             "imgur": { "name": "Imgur", "summary": "画像と動画投稿" },
             "odysee": { "name": "Odysee", "summary": "動画投稿" },
-            "rutube": { "name": "Rutube", "summary": "動画と HLS 配信" },
-            "groups": { "regional": "地域プラットフォーム", "social": "動画・ソーシャル", "web": "Web・メディア・音声" }
+            "rutube": { "name": "Rutube", "summary": "動画と HLS 配信" }
         },
         "linkFormats": {
             "title": "対応リンク形式",

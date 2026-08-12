@@ -521,8 +521,7 @@
             "coub": { "name": "Coub", "summary": "短循環影片" },
             "imgur": { "name": "Imgur", "summary": "圖片與影片內容" },
             "odysee": { "name": "Odysee", "summary": "影片內容" },
-            "rutube": { "name": "Rutube", "summary": "影片與 HLS 串流" },
-            "groups": { "regional": "地區平台", "social": "影片與社群平台", "web": "網頁、媒體與音訊" }
+            "rutube": { "name": "Rutube", "summary": "影片與 HLS 串流" }
         },
         "linkFormats": {
             "title": "支援的連結格式",

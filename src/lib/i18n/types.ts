@@ -469,11 +469,6 @@ export interface Dictionary {
             imgur: { name: string; summary: string; };
             odysee: { name: string; summary: string; };
             rutube: { name: string; summary: string; };
-            groups: {
-                regional: string;
-                social: string;
-                web: string;
-            };
             audioTip?: {
                 title: string;
                 steps: string;

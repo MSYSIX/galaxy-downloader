@@ -521,8 +521,7 @@
             "coub": { "name": "Coub", "summary": "Зацикленные видео" },
             "imgur": { "name": "Imgur", "summary": "Изображения и видеопубликации" },
             "odysee": { "name": "Odysee", "summary": "Видеопубликации" },
-            "rutube": { "name": "Rutube", "summary": "Видео и HLS-потоки" },
-            "groups": { "regional": "Региональные платформы", "social": "Видео и соцсети", "web": "Веб, медиа и аудио" }
+            "rutube": { "name": "Rutube", "summary": "Видео и HLS-потоки" }
         },
         "linkFormats": {
             "title": "Поддерживаемые форматы ссылок",

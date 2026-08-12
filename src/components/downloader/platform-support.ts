@@ -36,8 +36,6 @@ export type PlatformSupportKey =
     | 'odysee'
     | 'rutube';
 
-type PlatformSupportGroupKey = 'regional' | 'social' | 'web';
-
 type PlatformSupportVisual = {
     src?: string;
     darkSrc?: string;
@@ -51,14 +49,7 @@ type PlatformSupportVisual = {
 export type PlatformSupportItem = {
     key: PlatformSupportKey;
     name: string;
-    host: string;
     visual: PlatformSupportVisual;
-};
-
-export type PlatformSupportGroup = {
-    key: PlatformSupportGroupKey;
-    label: string;
-    items: PlatformSupportItem[];
 };
 
 type PlatformSupportDictionary = Pick<Dictionary, 'guide'>;
@@ -107,64 +98,23 @@ const PLATFORM_SUPPORT_VISUALS: Record<PlatformSupportKey, PlatformSupportVisual
     rutube: { fallbackLabel: 'RT', frameClassName: UNIFIED_FRAME_CLASS_NAME },
 };
 
-const PLATFORM_SUPPORT_CATALOG: Array<{ key: PlatformSupportKey; group: PlatformSupportGroupKey; host: string }> = [
-    { key: 'bilibili', group: 'regional', host: 'bilibili.com' },
-    { key: 'bilibiliTv', group: 'regional', host: 'bilibili.tv' },
-    { key: 'douyin', group: 'regional', host: 'douyin.com' },
-    { key: 'kuaishou', group: 'regional', host: 'kuaishou.com' },
-    { key: 'wechat', group: 'regional', host: 'mp.weixin.qq.com' },
-    { key: 'weibo', group: 'regional', host: 'weibo.com' },
-    { key: 'xiaohongshu', group: 'regional', host: 'xiaohongshu.com' },
-    { key: 'zhihu', group: 'regional', host: 'zhihu.com' },
-    { key: 'niconico', group: 'regional', host: 'nicovideo.jp' },
-    { key: 'rutube', group: 'regional', host: 'rutube.ru' },
-    { key: 'youtube', group: 'social', host: 'youtube.com' },
-    { key: 'tiktok', group: 'social', host: 'tiktok.com' },
-    { key: 'instagram', group: 'social', host: 'instagram.com' },
-    { key: 'x', group: 'social', host: 'x.com' },
-    { key: 'threads', group: 'social', host: 'threads.net' },
-    { key: 'telegram', group: 'social', host: 't.me' },
-    { key: 'bluesky', group: 'social', host: 'bsky.app' },
-    { key: 'rumble', group: 'social', host: 'rumble.com' },
-    { key: 'snapchat', group: 'social', host: 'snapchat.com' },
-    { key: 'coub', group: 'social', host: 'coub.com' },
-    { key: 'odysee', group: 'social', host: 'odysee.com' },
-    { key: 'vimeo', group: 'social', host: 'vimeo.com' },
-    { key: 'dailymotion', group: 'social', host: 'dailymotion.com' },
-    { key: 'streamable', group: 'social', host: 'streamable.com' },
-    { key: 'twitch', group: 'social', host: 'twitch.tv' },
-    { key: 'reddit', group: 'web', host: 'reddit.com' },
-    { key: 'tumblr', group: 'web', host: 'tumblr.com' },
-    { key: 'pinterest', group: 'web', host: 'pinterest.com' },
-    { key: 'vk', group: 'web', host: 'vk.com' },
-    { key: 'okru', group: 'web', host: 'ok.ru' },
-    { key: 'imgur', group: 'web', host: 'imgur.com' },
-    { key: 'soundcloud', group: 'web', host: 'soundcloud.com' },
-    { key: 'applePodcasts', group: 'web', host: 'podcasts.apple.com' },
-    { key: 'generic', group: 'web', host: 'web video / HLS' },
+const PLATFORM_SUPPORT_CATALOG: PlatformSupportKey[] = [
+    'bilibili', 'bilibiliTv', 'douyin', 'generic', 'youtube', 'telegram',
+    'threads', 'wechat', 'niconico', 'weibo', 'xiaohongshu', 'tiktok',
+    'instagram', 'x', 'vimeo', 'dailymotion', 'streamable', 'reddit',
+    'tumblr', 'pinterest', 'vk', 'okru', 'twitch', 'soundcloud',
+    'applePodcasts', 'kuaishou', 'zhihu', 'bluesky', 'rumble', 'snapchat',
+    'coub', 'imgur', 'odysee', 'rutube',
 ];
 
 function getEntry(dict: PlatformSupportDictionary, key: PlatformSupportKey) {
     return dict.guide.platformSupport[key];
 }
 
-export function getPlatformSupportGroups(dict: PlatformSupportDictionary): PlatformSupportGroup[] {
-    const labels = dict.guide.platformSupport.groups;
-    const items = PLATFORM_SUPPORT_CATALOG.map(({ key, group, host }) => ({
-        group,
+export function getPlatformSupportItems(dict: PlatformSupportDictionary): PlatformSupportItem[] {
+    return PLATFORM_SUPPORT_CATALOG.map((key) => ({
         key,
-        host,
         name: getEntry(dict, key).name,
         visual: PLATFORM_SUPPORT_VISUALS[key],
     }));
-
-    return (['regional', 'social', 'web'] as const).map((key) => ({
-        key,
-        label: labels[key],
-        items: items.filter((item) => item.group === key).map(({ group: _group, ...item }) => item),
-    }));
-}
-
-export function getPlatformSupportItems(dict: PlatformSupportDictionary): PlatformSupportItem[] {
-    return getPlatformSupportGroups(dict).flatMap((group) => group.items);
 }

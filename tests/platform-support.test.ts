@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getPlatformSupportGroups, getPlatformSupportItems } from '../src/components/downloader/platform-support';
+import { getPlatformSupportItems } from '../src/components/downloader/platform-support';
 import type { Dictionary } from '../src/lib/i18n/types';
 
 const dict = {
@@ -42,7 +42,6 @@ const dict = {
             imgur: { name: 'Imgur', summary: 'media' },
             odysee: { name: 'Odysee', summary: 'video' },
             rutube: { name: 'Rutube', summary: 'video' },
-            groups: { regional: 'Regional', social: 'Social', web: 'Web' },
             comingSoon: 'Coming soon',
         },
     },
@@ -73,10 +72,10 @@ describe('getPlatformSupportItems', () => {
         expect(keys).not.toContain('newgrounds');
     });
 
-    it('keeps the catalog grouped for scanning without hiding any entries', () => {
-        const groups = getPlatformSupportGroups(dict as unknown as Pick<Dictionary, 'guide'>);
+    it('keeps the API platform order in one compact list', () => {
+        const items = getPlatformSupportItems(dict as unknown as Pick<Dictionary, 'guide'>);
 
-        expect(groups.map((group) => group.key)).toEqual(['regional', 'social', 'web']);
-        expect(groups.flatMap((group) => group.items)).toHaveLength(34);
+        expect(items.slice(0, 4).map((item) => item.key)).toEqual(['bilibili', 'bilibiliTv', 'douyin', 'generic']);
+        expect(items.slice(-4).map((item) => item.key)).toEqual(['coub', 'imgur', 'odysee', 'rutube']);
     });
 });
