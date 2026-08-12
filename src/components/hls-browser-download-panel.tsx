@@ -57,10 +57,11 @@ export interface HlsBrowserDownloadPanelProps {
     initialSourceUrl: string
     initialResolvedPlaylistUrl?: string
     initialTitle?: string
-    autorun?: boolean
     onBusyChange?: (busy: boolean) => void
     onCancelReady?: (cancel: (() => void) | null) => void
 }
+
+type DownloadPhase = 'preparing' | 'ready' | 'downloading' | 'completed' | 'failed'
 
 function buildFetchHeaders(accept?: string, byterange?: ByteRange): HeadersInit | undefined {
     const headers: Record<string, string> = {}
@@ -367,23 +368,22 @@ export function HlsBrowserDownloadPanel({
     initialSourceUrl,
     initialResolvedPlaylistUrl,
     initialTitle = '',
-    autorun = false,
     onBusyChange,
     onCancelReady,
 }: HlsBrowserDownloadPanelProps) {
     const dict = useDictionary()
-    const [status, setStatus] = useState(dict.hlsDownload.idleStatus)
-    const [resolveLoading, setResolveLoading] = useState(false)
-    const [downloadLoading, setDownloadLoading] = useState(false)
+    const [phase, setPhase] = useState<DownloadPhase>('preparing')
+    const [status, setStatus] = useState(dict.hlsDownload.resolvingStatus)
     const [progress, setProgress] = useState(0)
-    const [failed, setFailed] = useState(false)
     const [speedBytesPerSecond, setSpeedBytesPerSecond] = useState<number | null>(null)
     const [etaSeconds, setEtaSeconds] = useState<number | null>(null)
-    const autorunTriggeredRef = useRef(false)
+    const [resolution, setResolution] = useState<PlaylistResolution | null>(null)
     const mountedRef = useRef(true)
     const activeAbortControllerRef = useRef<AbortController | null>(null)
     const downloadSamplesRef = useRef<DownloadSample[]>([])
-    const isBusy = resolveLoading || downloadLoading
+    const taskVersionRef = useRef(0)
+    const isBusy = phase === 'preparing' || phase === 'downloading'
+    const failed = phase === 'failed'
 
     useEffect(() => {
         onBusyChange?.(isBusy)
@@ -400,7 +400,8 @@ export function HlsBrowserDownloadPanel({
         activeAbortControllerRef.current?.abort()
         const controller = new AbortController()
         activeAbortControllerRef.current = controller
-        return controller
+        taskVersionRef.current += 1
+        return { controller, version: taskVersionRef.current }
     }, [])
 
     const finishTask = useCallback((controller: AbortController) => {
@@ -411,6 +412,7 @@ export function HlsBrowserDownloadPanel({
 
     const cancelActiveTask = useCallback(() => {
         activeAbortControllerRef.current?.abort()
+        taskVersionRef.current += 1
     }, [])
 
     useEffect(() => {
@@ -421,42 +423,85 @@ export function HlsBrowserDownloadPanel({
         }
     }, [cancelActiveTask, onCancelReady])
 
-    const handleStart = useCallback(async (): Promise<void> => {
-        const controller = startTask()
-        setResolveLoading(true)
-        setDownloadLoading(false)
-        setFailed(false)
+    const resetDownloadMetrics = useCallback(() => {
         setProgress(0)
         setSpeedBytesPerSecond(null)
         setEtaSeconds(null)
         downloadSamplesRef.current = []
+    }, [])
+
+    const preparePlaylist = useCallback(async (): Promise<void> => {
+        const { controller, version } = startTask()
+        setPhase('preparing')
+        setResolution(null)
+        resetDownloadMetrics()
         setStatus(dict.hlsDownload.resolvingStatus)
 
         try {
-            const resolution = await resolvePlaylist(
+            const nextResolution = await resolvePlaylist(
                 initialSourceUrl.trim(),
                 controller.signal,
                 initialResolvedPlaylistUrl?.trim(),
                 initialTitle.trim()
             )
 
-            if (!mountedRef.current) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
             }
 
             if (shouldBlockLargeHlsDownloadWithoutStreamingSave(
-                resolution.selectedSegments.length,
+                nextResolution.selectedSegments.length,
                 supportsStreamingFileSave
             )) {
                 setStatus(dict.hlsDownload.largeVideoBrowserLimitedStatus)
-                setFailed(true)
+                setPhase('failed')
                 return
             }
 
-            setResolveLoading(false)
-            setDownloadLoading(true)
-            setStatus(dict.hlsDownload.downloadingStatus)
+            setResolution(nextResolution)
+            setPhase('ready')
+            setStatus(dict.hlsDownload.idleStatus)
+        } catch (error) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
+                return
+            }
 
+            if (isAbortError(error)) {
+                setPhase('ready')
+                setStatus(dict.hlsDownload.idleStatus)
+                return
+            }
+
+            setPhase('failed')
+            setStatus(dict.hlsDownload.downloadFailedStatus)
+            console.error('Browser HLS playlist preparation failed:', error)
+        } finally {
+            finishTask(controller)
+        }
+    }, [dict.hlsDownload.downloadFailedStatus, dict.hlsDownload.idleStatus, dict.hlsDownload.largeVideoBrowserLimitedStatus, dict.hlsDownload.resolvingStatus, finishTask, initialResolvedPlaylistUrl, initialSourceUrl, initialTitle, resetDownloadMetrics, startTask])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void preparePlaylist()
+        }, 0)
+
+        return () => {
+            window.clearTimeout(timer)
+            cancelActiveTask()
+        }
+    }, [cancelActiveTask, preparePlaylist])
+
+    const handleStart = useCallback(async (): Promise<void> => {
+        if (!resolution) {
+            return
+        }
+
+        const { controller, version } = startTask()
+        setPhase('downloading')
+        resetDownloadMetrics()
+        setStatus(dict.hlsDownload.downloadingStatus)
+
+        try {
             const targets = [
                 ...(resolution.mapUrl
                     ? [{
@@ -478,12 +523,12 @@ export function HlsBrowserDownloadPanel({
                 resolution,
                 signal: controller.signal,
                 onChunkDownloaded: (bytes) => {
-                    completed += 1
-                    downloadedBytes += bytes
-
-                    if (!mountedRef.current) {
+                    if (!mountedRef.current || taskVersionRef.current !== version || controller.signal.aborted) {
                         return
                     }
+
+                    completed += 1
+                    downloadedBytes += bytes
 
                     const now = Date.now()
                     downloadSamplesRef.current = [
@@ -522,43 +567,35 @@ export function HlsBrowserDownloadPanel({
                 mimeTypes: [mimeType],
             })
 
-            if (!mountedRef.current) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
             }
 
             setProgress(100)
             setEtaSeconds(0)
+            setPhase('completed')
             setStatus(dict.hlsDownload.downloadCompletedStatus)
         } catch (error) {
-            if (!mountedRef.current) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
             }
 
             if (isAbortError(error)) {
+                resetDownloadMetrics()
+                setPhase('ready')
                 setStatus(dict.hlsDownload.idleStatus)
                 return
             }
 
+            cancelActiveTask()
+            resetDownloadMetrics()
+            setPhase('failed')
             setStatus(dict.hlsDownload.downloadFailedStatus)
-            setFailed(true)
             console.error('Browser HLS download failed:', error)
         } finally {
             finishTask(controller)
-            if (mountedRef.current) {
-                setResolveLoading(false)
-                setDownloadLoading(false)
-            }
         }
-    }, [dict.history.unknownTitle, dict.hlsDownload.downloadCompletedStatus, dict.hlsDownload.downloadFailedStatus, dict.hlsDownload.downloadingStatus, dict.hlsDownload.idleStatus, dict.hlsDownload.largeVideoBrowserLimitedStatus, dict.hlsDownload.resolvingStatus, finishTask, initialResolvedPlaylistUrl, initialSourceUrl, initialTitle, startTask])
-
-    useEffect(() => {
-        if (autorun && initialSourceUrl && !autorunTriggeredRef.current) {
-            autorunTriggeredRef.current = true
-            window.setTimeout(() => {
-                void handleStart()
-            }, 0)
-        }
-    }, [autorun, handleStart, initialSourceUrl])
+    }, [cancelActiveTask, dict.history.unknownTitle, dict.hlsDownload.downloadCompletedStatus, dict.hlsDownload.downloadFailedStatus, dict.hlsDownload.downloadingStatus, dict.hlsDownload.idleStatus, finishTask, initialTitle, resetDownloadMetrics, resolution, startTask])
 
     return (
         <div className="space-y-5">
@@ -603,9 +640,19 @@ export function HlsBrowserDownloadPanel({
                 </div>
             </div>
 
-            {failed || (!autorun && !isBusy && progress === 0) ? (
+            {!isBusy && phase !== 'completed' ? (
                 <div className="flex justify-end">
-                    <Button onClick={() => void handleStart()} disabled={isBusy}>
+                    <Button
+                        onClick={() => {
+                            if (phase === 'failed') {
+                                void preparePlaylist()
+                                return
+                            }
+
+                            void handleStart()
+                        }}
+                        disabled={phase !== 'ready' && phase !== 'failed'}
+                    >
                         {isBusy ? dict.hlsDownload.downloadingButton : dict.hlsDownload.downloadButton}
                     </Button>
                 </div>

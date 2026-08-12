@@ -44,20 +44,29 @@ export function HlsDownloadDialog({
     const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
     const [cancelDownload, setCancelDownload] = useState<(() => void) | null>(null)
 
+    const closeAndCancel = useCallback(() => {
+        cancelDownload?.()
+        onOpenChange(false)
+    }, [cancelDownload, onOpenChange])
+
     const handleOpenChange = useCallback((nextOpen: boolean) => {
         if (!nextOpen && isBusy) {
             setConfirmCloseOpen(true)
             return
         }
 
-        onOpenChange(nextOpen)
-    }, [isBusy, onOpenChange])
+        if (!nextOpen) {
+            closeAndCancel()
+            return
+        }
+
+        onOpenChange(true)
+    }, [closeAndCancel, isBusy, onOpenChange])
 
     const handleConfirmClose = useCallback(() => {
         setConfirmCloseOpen(false)
-        cancelDownload?.()
-        onOpenChange(false)
-    }, [cancelDownload, onOpenChange])
+        closeAndCancel()
+    }, [closeAndCancel])
 
     if (!request) {
         return null
@@ -85,7 +94,6 @@ export function HlsDownloadDialog({
                             initialSourceUrl={request.sourceUrl}
                             initialResolvedPlaylistUrl={request.resolvedPlaylistUrl}
                             initialTitle={request.title}
-                            autorun
                             onBusyChange={setIsBusy}
                             onCancelReady={setCancelDownload}
                         />

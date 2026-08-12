@@ -251,7 +251,7 @@
         "statusMerging": "正在合併…"
     },
     "hlsDownload": {
-        "description": "打開後會自動開始下載，請稍候。",
+        "description": "正在準備下載資源，準備完成後請點擊開始下載。",
         "outputTitle": "輸出檔名",
         "outputPlaceholder": "可選檔名前綴",
         "sourceUrl": "來源頁面或 m3u8 連結",
