@@ -43,6 +43,7 @@ public/sw.js.map
 public/workbox-*.js
 public/worker-*.js
 public/fallback-*.js
+public/ffmpeg-core/
 
 # typescript
 *.tsbuildinfo

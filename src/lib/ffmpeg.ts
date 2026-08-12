@@ -5,11 +5,22 @@ let loadPromise: Promise<FFmpeg> | null = null;
 
 // Keep this aligned with the installed @ffmpeg/ffmpeg package's expected core build.
 const FFMPEG_CORE_VERSION = '0.12.9';
-const FFMPEG_SOURCE_TIMEOUT_MS = 3000;
+const FFMPEG_ASSET_TIMEOUT_MS = 45_000;
+const FFMPEG_INITIALIZATION_TIMEOUT_MS = 45_000;
+const LOCAL_FFMPEG_CORE_BASE_URL = '/ffmpeg-core';
+const LOCAL_FFMPEG_WASM_PART_URLS = [
+  `${LOCAL_FFMPEG_CORE_BASE_URL}/ffmpeg-core.wasm.part-0`,
+  `${LOCAL_FFMPEG_CORE_BASE_URL}/ffmpeg-core.wasm.part-1`,
+];
 const FFMPEG_CORE_BASE_URLS = [
+  LOCAL_FFMPEG_CORE_BASE_URL,
   `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm`,
   `https://cdn.jsdmirror.com/npm/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm`,
 ];
+
+export function getFFmpegCoreBaseUrls(): readonly string[] {
+  return FFMPEG_CORE_BASE_URLS;
+}
 
 async function fetchBlobURL(
   url: string,
@@ -31,36 +42,65 @@ async function fetchBlobURL(
   return URL.createObjectURL(blob);
 }
 
-async function loadFFmpegCoreFromSource(ffmpeg: FFmpeg, baseURL: string) {
+async function fetchCombinedBlobURL(
+  urls: readonly string[],
+  mimeType: string,
+  signal: AbortSignal
+): Promise<string> {
+  const parts = await Promise.all(urls.map(async (url) => {
+    const response = await fetch(url, {
+      method: 'GET',
+      cache: 'force-cache',
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return response.arrayBuffer();
+  }));
+
+  return URL.createObjectURL(new Blob(parts, { type: mimeType }));
+}
+
+async function withTimeout<T>(
+  timeoutMs: number,
+  operation: (signal: AbortSignal) => Promise<T>
+): Promise<T> {
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => {
-    controller.abort(new DOMException(`Timed out after ${FFMPEG_SOURCE_TIMEOUT_MS}ms`, 'AbortError'));
-  }, FFMPEG_SOURCE_TIMEOUT_MS);
+    controller.abort(new DOMException(`Timed out after ${timeoutMs}ms`, 'AbortError'));
+  }, timeoutMs);
 
+  try {
+    return await operation(controller.signal);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function loadFFmpegCoreFromSource(ffmpeg: FFmpeg, baseURL: string) {
   let coreURL: string | null = null;
   let wasmURL: string | null = null;
 
   try {
-    coreURL = await fetchBlobURL(
-      `${baseURL}/ffmpeg-core.js`,
-      'text/javascript',
-      controller.signal
+    coreURL = await withTimeout(
+      FFMPEG_ASSET_TIMEOUT_MS,
+      (signal) => fetchBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript', signal)
     );
-    wasmURL = await fetchBlobURL(
-      `${baseURL}/ffmpeg-core.wasm`,
-      'application/wasm',
-      controller.signal
+    wasmURL = await withTimeout(
+      FFMPEG_ASSET_TIMEOUT_MS,
+      (signal) => baseURL === LOCAL_FFMPEG_CORE_BASE_URL
+        ? fetchCombinedBlobURL(LOCAL_FFMPEG_WASM_PART_URLS, 'application/wasm', signal)
+        : fetchBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm', signal)
     );
 
-    await ffmpeg.load({
+    await withTimeout(FFMPEG_INITIALIZATION_TIMEOUT_MS, (signal) => ffmpeg.load({
       coreURL,
       wasmURL,
-    }, {
-      signal: controller.signal,
-    });
+    }, { signal }));
   } finally {
-    clearTimeout(timeoutId);
-
     if (!ffmpeg.loaded) {
       if (coreURL) {
         URL.revokeObjectURL(coreURL);
