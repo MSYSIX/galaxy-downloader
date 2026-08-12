@@ -18,7 +18,7 @@ import {
     buildMediaPreviewUrl,
     buildPagePreview,
     buildPrimaryResultPreview,
-    canSharePlayResult,
+    buildResultPreviewForSelection,
     type MediaPreviewRequest,
 } from './media-preview';
 import { MultiPartList } from './MultiPartList';
@@ -57,6 +57,7 @@ function buildPageScopedResult(result: ResultData, page: NonNullable<ResultData[
         downloadAudioUrl: page.downloadAudioUrl ?? null,
         originDownloadVideoUrl: page.downloadVideoUrl ?? result.originDownloadVideoUrl ?? null,
         originDownloadAudioUrl: page.downloadAudioUrl ?? result.originDownloadAudioUrl ?? null,
+        videoAudioMode: page.videoAudioMode,
         mediaActions: undefined,
         currentPage: page.page,
     };
@@ -72,6 +73,7 @@ function buildVideoScopedResult(result: ResultData, video: NonNullable<ResultDat
         downloadAudioUrl: video.downloadAudioUrl ?? video.originDownloadAudioUrl ?? null,
         originDownloadVideoUrl: video.originDownloadVideoUrl ?? video.downloadVideoUrl ?? null,
         originDownloadAudioUrl: video.originDownloadAudioUrl ?? video.downloadAudioUrl ?? null,
+        videoAudioMode: video.videoAudioMode,
         mediaActions: video.mediaActions,
         currentItemId: video.id,
     };
@@ -108,8 +110,9 @@ export function VideoResultPanel({
     activePreview,
 }: VideoResultPanelProps) {
     const dict = useDictionary();
-    const activeListKey = `${result.url ?? ''}-${result.currentPage ?? ''}-${result.currentItemId ?? ''}`;
-    const defaultBiliList = result.currentItemId ? 'season' : 'pages';
+    const hasMultiplePages = Boolean(result.isMultiPart && result.pages && result.pages.length > 1);
+    const activeListKey = `${result.platform}-${result.url ?? ''}-${result.pages?.length ?? 0}-${result.videos?.length ?? 0}`;
+    const defaultBiliList = hasMultiplePages ? 'pages' : 'season';
     const [activeBiliListState, setActiveBiliListState] = useState<{ key: string; value: 'pages' | 'season' }>({
         key: activeListKey,
         value: defaultBiliList,
@@ -135,7 +138,7 @@ export function VideoResultPanel({
         images: result.images,
         coverUrl: result.cover,
     });
-    const isMultiPart = result.isMultiPart && result.pages && result.pages.length > 1;
+    const isMultiPart = hasMultiplePages;
     const isImageNote = result.noteType === 'image' && displayImages.length > 0;
     const hasEmbeddedVideos = !!result.videos?.length;
     const hasSeasonAlternative = (result.videos?.length || 0) > 1;
@@ -150,7 +153,6 @@ export function VideoResultPanel({
     const hasSupplementalImages = !isImageNote && displayImages.length > 0;
     const coverUrl = typeof result.cover === 'string' ? result.cover.trim() : '';
     const shareSourceUrl = typeof result.url === 'string' ? result.url.trim() : '';
-    const canSharePlayLink = shareSourceUrl.length > 0 && canSharePlayResult(result);
     const selectedPageNumber = selectionState.key === activeListKey ? selectionState.currentPage : result.currentPage;
     const selectedItemId = selectionState.key === activeListKey ? selectionState.currentItemId : result.currentItemId;
     const currentPage = resolveSelectedPage(result, selectedPageNumber);
@@ -164,13 +166,26 @@ export function VideoResultPanel({
                 : isMultiPart
                     ? 'pages'
                     : 'result';
+    const previewItem =
+        activeCollectionSource === 'pages'
+            ? currentPage
+                ? String(currentPage.page)
+                : undefined
+            : activeCollectionSource === 'season'
+                ? currentVideo?.id
+                : undefined;
     const effectiveResult =
         activeCollectionSource === 'pages' && currentPage
             ? buildPageScopedResult(result, currentPage)
             : activeCollectionSource === 'season' && currentVideo
                 ? buildVideoScopedResult(result, currentVideo)
                 : result;
-    const previewPreference = activePreview?.mediaType === 'audio';
+    const activePreviewMatchesSelection = Boolean(
+        activePreview
+        && activePreview.sourceUrl === shareSourceUrl
+        && activePreview.item === previewItem
+    );
+    const previewPreference = activePreviewMatchesSelection && activePreview?.mediaType === 'audio';
     const primaryPreview = buildSelectedPreview(
         shareSourceUrl,
         effectiveResult,
@@ -179,6 +194,7 @@ export function VideoResultPanel({
         currentVideo,
         { autoplay: false, preferAudio: previewPreference }
     );
+    const canSharePlayLink = shareSourceUrl.length > 0 && Boolean(primaryPreview);
     const selectedCoverUrl =
         activeCollectionSource === 'season' && currentVideo?.cover ? currentVideo.cover.trim() : coverUrl;
     const coverSrc = selectedCoverUrl.length > 0 ? resolveCoverSrc(selectedCoverUrl) : '';
@@ -205,16 +221,7 @@ export function VideoResultPanel({
               )
             : null;
     const playerUrl = hlsPlaybackUrl || (playerPreview ? buildMediaPreviewUrl(playerPreview) : null);
-    const previewItem =
-        activeCollectionSource === 'pages'
-            ? currentPage
-                ? String(currentPage.page)
-                : undefined
-            : activeCollectionSource === 'season'
-                ? currentVideo?.id
-                : undefined;
-
-    const handleSelectPage = (pageNumber: number) => {
+    const handleSelectPage = (pageNumber: number, mediaType: 'video' | 'audio') => {
         const page = result.pages?.find((item) => item.page === pageNumber);
         if (!page) return;
         setSelectionState((previous) => ({
@@ -222,10 +229,19 @@ export function VideoResultPanel({
             currentPage: pageNumber,
             currentItemId: previous.key === activeListKey ? previous.currentItemId : result.currentItemId,
         }));
+        const preview = buildResultPreviewForSelection(result, {
+            item: String(pageNumber),
+            mediaType,
+            autoplay: true,
+        });
+        if (preview) {
+            onRequestPreview({ ...preview, origin: 'user' });
+            return;
+        }
         onClearPreview();
     };
 
-    const handleSelectVideo = (itemId: string) => {
+    const handleSelectVideo = (itemId: string, mediaType: 'video' | 'audio') => {
         const video = result.videos?.find((item) => item.id === itemId);
         if (!video) return;
         setSelectionState((previous) => ({
@@ -233,6 +249,15 @@ export function VideoResultPanel({
             currentPage: previous.key === activeListKey ? previous.currentPage : result.currentPage,
             currentItemId: itemId,
         }));
+        const preview = buildResultPreviewForSelection(result, {
+            item: itemId,
+            mediaType,
+            autoplay: true,
+        });
+        if (preview) {
+            onRequestPreview({ ...preview, origin: 'user' });
+            return;
+        }
         onClearPreview();
     };
 
@@ -247,6 +272,10 @@ export function VideoResultPanel({
             const shareUrl = new URL(`${window.location.origin}${localePrefix}/play`);
             shareUrl.searchParams.set('play', shareSourceUrl);
             shareUrl.searchParams.set('autoplay', '1');
+            shareUrl.searchParams.set('type', primaryPreview!.mediaType);
+            if (primaryPreview!.item) {
+                shareUrl.searchParams.set('item', primaryPreview!.item);
+            }
             await navigator.clipboard.writeText(shareUrl.toString());
             toast.success(dict.result.sharePlayLinkCopied);
         } catch (error) {
@@ -346,14 +375,14 @@ export function VideoResultPanel({
                                     )}
                                     {showMultiPartList ? (
                                         <MultiPartList
-                                            key={`pages-${result.url ?? ''}-${selectedPageNumber ?? ''}-${result.pages?.length ?? 0}`}
+                                            key={`pages-${result.url ?? ''}-${result.pages?.length ?? 0}`}
                                             pages={result.pages!}
                                             currentPage={currentPage?.page}
                                             onSelectPage={handleSelectPage}
                                         />
                                     ) : showSeasonList ? (
                                         <EmbeddedVideoList
-                                            key={`videos-${result.url ?? ''}-${result.currentItemId ?? ''}-${result.videos?.length ?? 0}`}
+                                            key={`videos-${result.url ?? ''}-${result.videos?.length ?? 0}`}
                                             videos={result.videos!}
                                             currentItemId={currentVideo?.id}
                                             autoScrollKey={activeListKey}

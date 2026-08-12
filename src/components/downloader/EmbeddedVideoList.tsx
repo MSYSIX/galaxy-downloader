@@ -1,32 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Play } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useDictionary } from '@/i18n/client';
 import type { EmbeddedVideoInfo } from '@/lib/types';
 import { formatDuration } from '@/lib/utils';
 
-import { MediaActionIconButton } from './MediaActionIconButton';
-import { shouldShowVideoDownloadButton } from './result-card-visibility';
+import { CollectionItemActions, type CollectionPreviewMediaType } from './CollectionItemActions';
+import { canPreviewEmbeddedVideoAudio, canPreviewEmbeddedVideoVideo } from './media-preview';
 import { LOAD_MORE_BATCH, useChunkedMobileList } from './use-chunked-mobile-list';
 import { replaceTemplate } from './result-card-utils';
 import { useTemporaryDownloadKeys } from './use-temporary-download-keys';
-import { VideoDownloadIcon, AudioDownloadIcon } from './CustomIcons';
 
 const DEFAULT_VISIBLE_PARTS = 100;
-
-function getActionRowClass(actionCount: number) {
-    if (actionCount >= 3) {
-        return 'grid-cols-3';
-    }
-
-    if (actionCount === 2) {
-        return 'grid-cols-2';
-    }
-
-    return 'grid-cols-1';
-}
 
 export function EmbeddedVideoList({
     videos,
@@ -39,7 +24,7 @@ export function EmbeddedVideoList({
     currentItemId?: string;
     autoScrollKey?: string;
     autoScrollItemId?: string;
-    onSelectItem?: (itemId: string) => void;
+    onSelectItem?: (itemId: string, mediaType: CollectionPreviewMediaType) => void;
 }) {
     const dict = useDictionary();
     const { loadingKeys, triggerDownload } = useTemporaryDownloadKeys();
@@ -48,11 +33,15 @@ export function EmbeddedVideoList({
     const itemRefs = useRef(new Map<string, HTMLDivElement>());
     const lastAutoScrolledKeyRef = useRef<string | null>(null);
     const normalizedQuery = searchQuery.trim().toLowerCase();
+    const indexedVideos = useMemo(
+        () => videos.map((video, originalIndex) => ({ video, originalIndex })),
+        [videos]
+    );
     const filteredVideos = normalizedQuery
-        ? videos.filter((video) => (video.title || '').toLowerCase().includes(normalizedQuery))
-        : videos;
+        ? indexedVideos.filter(({ video }) => (video.title || '').toLowerCase().includes(normalizedQuery))
+        : indexedVideos;
     const autoScrollIndex = useMemo(
-        () => filteredVideos.findIndex((video) => video.id === autoScrollItemId),
+        () => filteredVideos.findIndex(({ video }) => video.id === autoScrollItemId),
         [autoScrollItemId, filteredVideos]
     );
     const {
@@ -132,19 +121,18 @@ export function EmbeddedVideoList({
                             {dict.result.collectionNoSearchResults}
                         </p>
                     )}
-                    {visibleVideos.map((video, index) => {
+                    {visibleVideos.map(({ video, originalIndex }) => {
                         const videoDownloadUrl = video.downloadVideoUrl || video.originDownloadVideoUrl || null;
                         const audioDownloadUrl = video.downloadAudioUrl || video.originDownloadAudioUrl || null;
                         const displayTitle = video.title?.trim()
-                            || replaceTemplate(dict.result.articleVideoUntitled, '{index}', String(index + 1));
-                        const videoKey = `${video.id || index}-video`;
-                        const audioKey = `${video.id || index}-audio`;
+                            || replaceTemplate(dict.result.articleVideoUntitled, '{index}', String(originalIndex + 1));
+                        const videoKey = `${video.id || originalIndex}-video`;
+                        const audioKey = `${video.id || originalIndex}-audio`;
                         const isCurrentItem = Boolean(currentItemId) && video.id === currentItemId;
-                        const downloadActionCount = Number(shouldShowVideoDownloadButton(videoDownloadUrl)) + Number(Boolean(audioDownloadUrl));
 
                         return (
                             <div
-                                key={video.id || index}
+                                key={video.id || originalIndex}
                                 ref={(element) => {
                                     if (!video.id) {
                                         return;
@@ -161,10 +149,11 @@ export function EmbeddedVideoList({
                                         ? 'border-primary bg-primary/5'
                                         : 'border-border hover:bg-muted/50'
                                 }`}
+                                style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 112px' }}
                             >
                                 <div className="flex w-full items-start gap-2 min-w-0 overflow-hidden">
                                     <span className="text-xs font-medium text-foreground/70 shrink-0">
-                                        {index + 1}
+                                        {originalIndex + 1}
                                     </span>
                                     <div className="flex w-full items-center gap-2 flex-1 min-w-0 overflow-hidden">
                                         <div className="text-[13px] truncate min-w-0 flex-1 max-w-[64vw] sm:max-w-none" title={displayTitle}>
@@ -177,45 +166,18 @@ export function EmbeddedVideoList({
                                         )}
                                     </div>
                                 </div>
-                                <div className="w-full space-y-2 md:min-w-[11rem] md:shrink-0">
-                                    <div className="grid grid-cols-1 gap-2">
-                                        <MediaActionIconButton
-                                            label={`${dict.result.playVideo}: ${displayTitle}`}
-                                            text={dict.result.playVideo}
-                                            icon={Play}
-                                            variant="secondary"
-                                            disabled={isCurrentItem}
-                                            className="w-full"
-                                            onClick={() => onSelectItem?.(video.id)}
-                                        />
-                                    </div>
-                                    {downloadActionCount > 0 && (
-                                        <div className={`grid ${getActionRowClass(downloadActionCount)} gap-2`}>
-                                            {shouldShowVideoDownloadButton(videoDownloadUrl) && (
-                                                <MediaActionIconButton
-                                                    label={dict.result.downloadVideo}
-                                                    icon={VideoDownloadIcon}
-                                                    variant="default"
-                                                    disabled={loadingKeys.has(videoKey)}
-                                                    loading={loadingKeys.has(videoKey)}
-                                                    className="w-full"
-                                                    onClick={() => triggerDownload(videoDownloadUrl!, videoKey)}
-                                                />
-                                            )}
-                                            {audioDownloadUrl && (
-                                                <MediaActionIconButton
-                                                    label={dict.result.downloadAudio}
-                                                    icon={AudioDownloadIcon}
-                                                    variant="default"
-                                                    disabled={loadingKeys.has(audioKey)}
-                                                    loading={loadingKeys.has(audioKey)}
-                                                    className="w-full"
-                                                    onClick={() => triggerDownload(audioDownloadUrl, audioKey)}
-                                                />
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                                <CollectionItemActions
+                                    title={displayTitle}
+                                    canPlayVideo={canPreviewEmbeddedVideoVideo(video)}
+                                    canPlayAudio={canPreviewEmbeddedVideoAudio(video)}
+                                    videoDownloadUrl={videoDownloadUrl}
+                                    audioDownloadUrl={audioDownloadUrl}
+                                    videoLoading={loadingKeys.has(videoKey)}
+                                    audioLoading={loadingKeys.has(audioKey)}
+                                    onPlay={(mediaType) => onSelectItem?.(video.id, mediaType)}
+                                    onDownloadVideo={(url) => triggerDownload(url, videoKey)}
+                                    onDownloadAudio={(url) => triggerDownload(url, audioKey)}
+                                />
                             </div>
                         );
                     })}

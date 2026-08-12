@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { PlatformBadge } from '@/components/platform-badge'
 import { ViewportSideRailAd } from '@/components/ads/viewport-side-rail-ad'
-import { buildMediaPreviewUrl, canSharePlayResult } from '@/components/downloader/media-preview'
+import { buildMediaPreviewUrl, buildResultPreviewForSelection } from '@/components/downloader/media-preview'
 import { useAppLocale, useDictionary } from '@/i18n/client'
 import { isApiRequestError, resolveApiErrorMessage } from '@/lib/api-errors'
 import { buildHlsPlayProxyUrl, HLS_PLAYLIST_ACCEPT, isHlsPlaylistUrl } from '@/lib/hls-playback'
@@ -26,6 +26,8 @@ export function PlayPageClient() {
 
     const sourceUrl = (searchParams.get('url') || searchParams.get('play') || '').trim()
     const autoplay = searchParams.get('autoplay') === '1'
+    const requestedItem = searchParams.get('item')?.trim() || undefined
+    const requestedMediaType = searchParams.get('type') === 'audio' ? 'audio' : 'video'
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -89,7 +91,18 @@ export function PlayPageClient() {
     const visibleParseResult = sourceUrl ? parseResult : null
     const displayError = sourceUrl ? error : dict.errors.emptyUrl
     const canonicalSourceUrl = (visibleParseResult?.url || sourceUrl).trim()
+    const selectedPreview = useMemo(() => visibleParseResult
+        ? buildResultPreviewForSelection(visibleParseResult, {
+              item: requestedItem,
+              mediaType: requestedMediaType,
+              autoplay,
+          })
+        : null, [autoplay, requestedItem, requestedMediaType, visibleParseResult])
     const hlsPlaybackUrl = useMemo(() => {
+        if (selectedPreview?.mediaType !== 'video' || selectedPreview.item) {
+            return null
+        }
+
         const playlistUrl = visibleParseResult?.originDownloadVideoUrl?.trim()
         if (!playlistUrl || !isHlsPlaylistUrl(playlistUrl)) {
             return null
@@ -100,24 +113,21 @@ export function PlayPageClient() {
             canonicalSourceUrl || playlistUrl,
             HLS_PLAYLIST_ACCEPT
         )
-    }, [canonicalSourceUrl, visibleParseResult])
+    }, [canonicalSourceUrl, selectedPreview, visibleParseResult])
     const playbackUrl = useMemo(() => {
         if (hlsPlaybackUrl) {
             return hlsPlaybackUrl
         }
 
-        if (!canonicalSourceUrl || !visibleParseResult) {
+        if (!selectedPreview) {
             return null
         }
 
-        return buildMediaPreviewUrl({
-            mediaType: 'video',
-            sourceUrl: canonicalSourceUrl,
-            title: visibleParseResult.title,
-        })
-    }, [canonicalSourceUrl, hlsPlaybackUrl, visibleParseResult])
+        return buildMediaPreviewUrl(selectedPreview)
+    }, [hlsPlaybackUrl, selectedPreview])
 
-    const canPlay = visibleParseResult ? canSharePlayResult(visibleParseResult) : false
+    const canPlay = Boolean(selectedPreview)
+    const displayTitle = selectedPreview?.title || visibleParseResult?.title || ''
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
@@ -131,7 +141,15 @@ export function PlayPageClient() {
                             </div>
                         </div>
                     ) : (canPlay && playbackUrl) ? (
-                        hlsPlaybackUrl ? (
+                        selectedPreview?.mediaType === 'audio' ? (
+                            <audio
+                                src={playbackUrl}
+                                controls
+                                autoPlay={autoplay}
+                                preload="metadata"
+                                className="block w-full"
+                            />
+                        ) : hlsPlaybackUrl ? (
                             <HlsVideoPlayer
                                 src={playbackUrl}
                                 controls
@@ -172,7 +190,7 @@ export function PlayPageClient() {
 
                         {!loading && !displayError && visibleParseResult && (
                             <div className="w-full space-y-1.5">
-                                <h2 className="text-base sm:text-lg leading-snug font-semibold wrap-break-word" title={visibleParseResult.title}>{visibleParseResult.title}</h2>
+                                <h2 className="text-base sm:text-lg leading-snug font-semibold wrap-break-word" title={displayTitle}>{displayTitle}</h2>
                                 <div className="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs text-muted-foreground">
                                     <PlatformBadge platform={visibleParseResult.platform} />
                                     {canonicalSourceUrl ? (
