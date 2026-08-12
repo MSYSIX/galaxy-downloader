@@ -511,7 +511,18 @@
                     "Воспроизведение эпизодов",
                     "Загрузка"
                 ]
-            }
+            },
+            "kuaishou": { "name": "Kuaishou", "summary": "Видео и публикации с изображениями" },
+            "zhihu": { "name": "Zhihu", "summary": "Видеоконтент" },
+            "generic": { "name": "Веб / HLS", "summary": "Поддерживаемые веб-видео и HLS-потоки" },
+            "bluesky": { "name": "Bluesky", "summary": "Видеопубликации" },
+            "rumble": { "name": "Rumble", "summary": "Видеопубликации" },
+            "snapchat": { "name": "Snapchat", "summary": "Видео Spotlight" },
+            "coub": { "name": "Coub", "summary": "Зацикленные видео" },
+            "imgur": { "name": "Imgur", "summary": "Изображения и видеопубликации" },
+            "odysee": { "name": "Odysee", "summary": "Видеопубликации" },
+            "rutube": { "name": "Rutube", "summary": "Видео и HLS-потоки" },
+            "groups": { "regional": "Региональные платформы", "social": "Видео и соцсети", "web": "Веб, медиа и аудио" }
         },
         "linkFormats": {
             "title": "Поддерживаемые форматы ссылок",

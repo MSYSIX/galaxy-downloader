@@ -1,6 +1,42 @@
 {
   "versions": [
     {
+      "version": "6.2.0",
+      "date": "2026-08-12",
+      "changes": {
+        "zh": [
+          "HLS 浏览器下载改为通过 Cloudflare Worker 代理，解决 Rutube 等平台的跨域播放列表和分片限制",
+          "下载窗口改为点击后开始，关闭窗口会停止正在进行的 HLS 下载",
+          "支持平台目录现完整展示 API 已注册的 34 个平台"
+        ],
+        "en": [
+          "Browser HLS downloads now use a Cloudflare Worker proxy for cross-origin playlists and segments on platforms such as Rutube",
+          "Downloads begin after an explicit click, and closing the dialog stops the active HLS download",
+          "The Platforms directory now lists all 34 platforms registered by the API"
+        ],
+        "ja": [
+          "ブラウザの HLS ダウンロードは Cloudflare Worker プロキシを経由し、Rutube などのクロスオリジンのプレイリストとセグメントに対応しました",
+          "ダウンロードはクリック後に開始され、ダイアログを閉じると進行中の HLS ダウンロードを停止します",
+          "対応プラットフォーム一覧に API 登録済みの 34 プラットフォームをすべて表示します"
+        ],
+        "zh-tw": [
+          "瀏覽器 HLS 下載改由 Cloudflare Worker Proxy 處理，解決 Rutube 等平台的跨網域播放清單與分片限制",
+          "下載會在點擊後開始，關閉視窗會停止進行中的 HLS 下載",
+          "支援平台目錄現完整列出 API 已註冊的 34 個平台"
+        ],
+        "es": [
+          "Las descargas HLS en el navegador ahora usan un proxy de Cloudflare Worker para listas y segmentos entre orígenes en plataformas como Rutube",
+          "Las descargas comienzan tras un clic explícito y cerrar el cuadro detiene la descarga HLS activa",
+          "El directorio de plataformas ahora muestra las 34 plataformas registradas por la API"
+        ],
+        "ru": [
+          "Загрузки HLS в браузере теперь используют прокси Cloudflare Worker для кросс-доменных плейлистов и сегментов на платформах вроде Rutube",
+          "Загрузка начинается после явного нажатия, а закрытие окна останавливает активную HLS-загрузку",
+          "В каталоге платформ теперь показаны все 34 платформы, зарегистрированные в API"
+        ]
+      }
+    },
+    {
       "version": "6.1.0",
       "date": "2026-07-23",
       "changes": {

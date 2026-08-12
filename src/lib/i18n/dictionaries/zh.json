@@ -511,7 +511,18 @@
                     "逐集播放",
                     "下载"
                 ]
-            }
+            },
+            "kuaishou": { "name": "快手", "summary": "视频与图文" },
+            "zhihu": { "name": "知乎", "summary": "视频内容" },
+            "generic": { "name": "网页 / HLS", "summary": "支持的网页视频与 HLS 流" },
+            "bluesky": { "name": "Bluesky", "summary": "视频内容" },
+            "rumble": { "name": "Rumble", "summary": "视频内容" },
+            "snapchat": { "name": "Snapchat", "summary": "Spotlight 视频" },
+            "coub": { "name": "Coub", "summary": "短循环视频" },
+            "imgur": { "name": "Imgur", "summary": "图片与视频内容" },
+            "odysee": { "name": "Odysee", "summary": "视频内容" },
+            "rutube": { "name": "Rutube", "summary": "视频与 HLS 流" },
+            "groups": { "regional": "地区平台", "social": "视频与社交平台", "web": "网页、媒体与音频" }
         },
         "linkFormats": {
             "title": "支持的链接格式",

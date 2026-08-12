@@ -511,7 +511,18 @@
                     "Episode playback",
                     "Download"
                 ]
-            }
+            },
+            "kuaishou": { "name": "Kuaishou", "summary": "Video and image posts" },
+            "zhihu": { "name": "Zhihu", "summary": "Video posts" },
+            "generic": { "name": "Web / HLS", "summary": "Supported web videos and HLS streams" },
+            "bluesky": { "name": "Bluesky", "summary": "Video posts" },
+            "rumble": { "name": "Rumble", "summary": "Video posts" },
+            "snapchat": { "name": "Snapchat", "summary": "Spotlight videos" },
+            "coub": { "name": "Coub", "summary": "Video loops" },
+            "imgur": { "name": "Imgur", "summary": "Images and video posts" },
+            "odysee": { "name": "Odysee", "summary": "Video posts" },
+            "rutube": { "name": "Rutube", "summary": "Video and HLS streams" },
+            "groups": { "regional": "Regional platforms", "social": "Video and social", "web": "Web, media and audio" }
         },
         "linkFormats": {
             "title": "Supported Link Formats",

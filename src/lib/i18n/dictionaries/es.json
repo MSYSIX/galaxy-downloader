@@ -511,7 +511,18 @@
                     "Reproducción por episodio",
                     "Descarga"
                 ]
-            }
+            },
+            "kuaishou": { "name": "Kuaishou", "summary": "Videos y publicaciones con imágenes" },
+            "zhihu": { "name": "Zhihu", "summary": "Contenido de video" },
+            "generic": { "name": "Web / HLS", "summary": "Videos web y transmisiones HLS compatibles" },
+            "bluesky": { "name": "Bluesky", "summary": "Publicaciones de video" },
+            "rumble": { "name": "Rumble", "summary": "Publicaciones de video" },
+            "snapchat": { "name": "Snapchat", "summary": "Videos de Spotlight" },
+            "coub": { "name": "Coub", "summary": "Videos en bucle" },
+            "imgur": { "name": "Imgur", "summary": "Imágenes y publicaciones de video" },
+            "odysee": { "name": "Odysee", "summary": "Publicaciones de video" },
+            "rutube": { "name": "Rutube", "summary": "Videos y transmisiones HLS" },
+            "groups": { "regional": "Plataformas regionales", "social": "Video y redes sociales", "web": "Web, medios y audio" }
         },
         "linkFormats": {
             "title": "Formatos de enlace admitidos",
