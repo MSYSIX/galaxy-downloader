@@ -549,6 +549,10 @@
             "tip": "Tip: Just copy the share link, no manual modification needed"
         }
     },
+    "todayStats": {
+        "title": "Parsed Today",
+        "countLabel": "successful parses"
+    },
     "freeSupport": {
         "title": "Permanently Free Service",
         "features": {

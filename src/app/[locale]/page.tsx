@@ -5,6 +5,7 @@ import { ViewportSideRailAd } from "@/components/ads/viewport-side-rail-ad"
 import { FreeSupportCard } from "@/components/downloader/FreeSupportCard"
 import { PlatformGuideCard } from "@/components/downloader/PlatformGuideCard"
 import { QuickStartCard } from "@/components/downloader/QuickStartCard"
+import { TodayStatsCard } from "@/components/downloader/TodayStatsCard"
 import { StructuredData } from "@/components/structured-data"
 import { Footer } from "@/components/layout/footer"
 import type { Locale } from "@/lib/i18n/config"
@@ -26,6 +27,7 @@ export default async function HomePage({
             <UnifiedDownloaderClient
                 leftRail={
                     <>
+                        <TodayStatsCard dict={dict} />
                         <QuickStartCard dict={dict} />
                         <FreeSupportCard dict={dict} />
                         <ViewportSideRailAd slot="1341604736" showOn="desktop" height={250} />
@@ -42,6 +44,7 @@ export default async function HomePage({
                 }
                 mobileGuides={
                     <>
+                        <TodayStatsCard dict={dict} />
                         <QuickStartCard dict={dict} />
                         <FreeSupportCard dict={dict} />
                         <PlatformGuideCard dict={dict} />

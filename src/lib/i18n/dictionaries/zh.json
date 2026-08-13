@@ -549,6 +549,10 @@
             "tip": "提示：复制分享链接即可，无需手动修改"
         }
     },
+    "todayStats": {
+        "title": "今日解析",
+        "countLabel": "次成功解析"
+    },
     "freeSupport": {
         "title": "永久免费服务",
         "features": {

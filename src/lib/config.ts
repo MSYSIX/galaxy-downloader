@@ -48,4 +48,7 @@ export const API_ENDPOINTS = {
         play: buildApiUrl('/api/play'),
     },
     feedback: buildApiUrl('/api/feedback'),
+    stats: {
+        today: buildApiUrl('/api/stats/today'),
+    },
 } as const

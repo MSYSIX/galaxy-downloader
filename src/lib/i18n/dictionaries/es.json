@@ -549,6 +549,10 @@
             "tip": "Consejo: simplemente copie el enlace para compartir, no es necesario realizar modificaciones manuales"
         }
     },
+    "todayStats": {
+        "title": "Analizados hoy",
+        "countLabel": "análisis exitosos"
+    },
     "freeSupport": {
         "title": "Servicio permanentemente gratuito",
         "features": {

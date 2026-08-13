@@ -499,6 +499,10 @@ export interface Dictionary {
             tip: string;
         };
     };
+    todayStats: {
+        title: string;
+        countLabel: string;
+    };
     freeSupport: {
         title: string;
         features: {
