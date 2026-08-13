@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { History, Home, MessageSquare, Music } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DeferredLanguageSwitcher } from '@/components/deferred-language-switcher'
+import { DeferredChangelogDialog } from '@/components/deferred-changelog-dialog'
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { DeferredMobileNavMenu } from '@/components/deferred-mobile-nav-menu'
 import { useDictionary } from '@/i18n/client'
@@ -91,6 +92,7 @@ export function AppTopBar({
                             </Link>
                         </Button>
                         <DeferredLanguageSwitcher iconOnly />
+                        <DeferredChangelogDialog triggerIconOnly triggerClassName="h-8 w-8" />
                         <DeferredMobileNavMenu />
                     </div>
                 </div>
@@ -150,6 +152,7 @@ export function AppTopBar({
                             </Link>
                         </Button>
                         <ThemeSwitcher />
+                        <DeferredChangelogDialog />
                         <DeferredLanguageSwitcher />
                     </div>
                 </div>

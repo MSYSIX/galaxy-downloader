@@ -251,7 +251,7 @@
         "statusMerging": "結合中…"
     },
     "hlsDownload": {
-        "description": "まずブラウザで HLS セグメントを直接取得し、失敗したリクエストだけを同一オリジンのプロキシにフォールバックします。",
+        "description": "HLS リソースはダウンロードサービスを通じて安全に転送されます。",
         "outputTitle": "出力ファイル名",
         "outputPlaceholder": "任意のファイル名プレフィックス",
         "sourceUrl": "元ページまたは m3u8 URL",
@@ -511,7 +511,17 @@
                     "エピソード再生",
                     "ダウンロード"
                 ]
-            }
+            },
+            "kuaishou": { "name": "Kuaishou", "summary": "動画と画像投稿" },
+            "zhihu": { "name": "Zhihu", "summary": "動画コンテンツ" },
+            "generic": { "name": "Web / HLS", "summary": "対応する Web 動画と HLS 配信" },
+            "bluesky": { "name": "Bluesky", "summary": "動画投稿" },
+            "rumble": { "name": "Rumble", "summary": "動画投稿" },
+            "snapchat": { "name": "Snapchat", "summary": "Spotlight 動画" },
+            "coub": { "name": "Coub", "summary": "ループ動画" },
+            "imgur": { "name": "Imgur", "summary": "画像と動画投稿" },
+            "odysee": { "name": "Odysee", "summary": "動画投稿" },
+            "rutube": { "name": "Rutube", "summary": "動画と HLS 配信" }
         },
         "linkFormats": {
             "title": "対応リンク形式",
@@ -538,6 +548,10 @@
             },
             "tip": "ヒント: 共有リンクをそのままコピーするだけで、手動修正は不要です"
         }
+    },
+    "todayStats": {
+        "title": "本日の解析",
+        "countLabel": "件の解析成功"
     },
     "freeSupport": {
         "title": "永久無料サービス",

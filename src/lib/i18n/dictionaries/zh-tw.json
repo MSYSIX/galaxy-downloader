@@ -251,7 +251,7 @@
         "statusMerging": "正在合併…"
     },
     "hlsDownload": {
-        "description": "打開後會自動開始下載，請稍候。",
+        "description": "正在準備下載資源，準備完成後請點擊開始下載。",
         "outputTitle": "輸出檔名",
         "outputPlaceholder": "可選檔名前綴",
         "sourceUrl": "來源頁面或 m3u8 連結",
@@ -511,7 +511,17 @@
                     "逐集播放",
                     "下載"
                 ]
-            }
+            },
+            "kuaishou": { "name": "快手", "summary": "影片與圖文" },
+            "zhihu": { "name": "知乎", "summary": "影片內容" },
+            "generic": { "name": "網頁 / HLS", "summary": "支援的網頁影片與 HLS 串流" },
+            "bluesky": { "name": "Bluesky", "summary": "影片內容" },
+            "rumble": { "name": "Rumble", "summary": "影片內容" },
+            "snapchat": { "name": "Snapchat", "summary": "Spotlight 影片" },
+            "coub": { "name": "Coub", "summary": "短循環影片" },
+            "imgur": { "name": "Imgur", "summary": "圖片與影片內容" },
+            "odysee": { "name": "Odysee", "summary": "影片內容" },
+            "rutube": { "name": "Rutube", "summary": "影片與 HLS 串流" }
         },
         "linkFormats": {
             "title": "支援的連結格式",
@@ -538,6 +548,10 @@
             },
             "tip": "提示：複製分享連結即可，無需手動修改"
         }
+    },
+    "todayStats": {
+        "title": "今日解析",
+        "countLabel": "次成功解析"
     },
     "freeSupport": {
         "title": "永久免費服務",

@@ -251,7 +251,7 @@
         "statusMerging": "Fusionando…"
     },
     "hlsDownload": {
-        "description": "Intenta descargar primero los segmentos HLS directamente en el navegador. Solo las solicitudes fallidas usan el proxy del mismo origen.",
+        "description": "Los recursos HLS se transfieren de forma segura mediante el servicio de descarga.",
         "outputTitle": "Título de salida",
         "outputPlaceholder": "Prefijo opcional para el nombre del archivo",
         "sourceUrl": "URL de la página o m3u8",
@@ -511,7 +511,17 @@
                     "Reproducción por episodio",
                     "Descarga"
                 ]
-            }
+            },
+            "kuaishou": { "name": "Kuaishou", "summary": "Videos y publicaciones con imágenes" },
+            "zhihu": { "name": "Zhihu", "summary": "Contenido de video" },
+            "generic": { "name": "Web / HLS", "summary": "Videos web y transmisiones HLS compatibles" },
+            "bluesky": { "name": "Bluesky", "summary": "Publicaciones de video" },
+            "rumble": { "name": "Rumble", "summary": "Publicaciones de video" },
+            "snapchat": { "name": "Snapchat", "summary": "Videos de Spotlight" },
+            "coub": { "name": "Coub", "summary": "Videos en bucle" },
+            "imgur": { "name": "Imgur", "summary": "Imágenes y publicaciones de video" },
+            "odysee": { "name": "Odysee", "summary": "Publicaciones de video" },
+            "rutube": { "name": "Rutube", "summary": "Videos y transmisiones HLS" }
         },
         "linkFormats": {
             "title": "Formatos de enlace admitidos",
@@ -538,6 +548,10 @@
             },
             "tip": "Consejo: simplemente copie el enlace para compartir, no es necesario realizar modificaciones manuales"
         }
+    },
+    "todayStats": {
+        "title": "Analizados hoy",
+        "countLabel": "análisis exitosos"
     },
     "freeSupport": {
         "title": "Servicio permanentemente gratuito",

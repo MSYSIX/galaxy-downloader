@@ -64,6 +64,52 @@ function isHttpProtocol(protocol: string): boolean {
     return protocol === 'http:' || protocol === 'https:';
 }
 
+// 有些 CDN 会把图片当二进制发（Bluesky 的 video.bsky.app 缩略图就是
+// application/octet-stream），只看 Content-Type 会把好图判成非图片。
+const GENERIC_BINARY_CONTENT_TYPES = new Set([
+    '',
+    'application/octet-stream',
+    'binary/octet-stream',
+    'application/binary',
+]);
+
+function startsWithBytes(bytes: Uint8Array, signature: number[], offset = 0): boolean {
+    if (bytes.length < offset + signature.length) {
+        return false;
+    }
+    return signature.every((byte, index) => bytes[offset + index] === byte);
+}
+
+/**
+ * 按 magic number 认图片类型。Content-Type 不可信时才用。
+ */
+function sniffImageContentType(bytes: Uint8Array): string | undefined {
+    if (startsWithBytes(bytes, [0xff, 0xd8, 0xff])) {
+        return 'image/jpeg';
+    }
+    if (startsWithBytes(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) {
+        return 'image/png';
+    }
+    if (startsWithBytes(bytes, [0x47, 0x49, 0x46, 0x38])) {
+        return 'image/gif';
+    }
+    if (startsWithBytes(bytes, [0x42, 0x4d])) {
+        return 'image/bmp';
+    }
+    // RIFF....WEBP
+    if (startsWithBytes(bytes, [0x52, 0x49, 0x46, 0x46]) && startsWithBytes(bytes, [0x57, 0x45, 0x42, 0x50], 8)) {
+        return 'image/webp';
+    }
+    // ....ftypavif / ftypavis
+    if (startsWithBytes(bytes, [0x66, 0x74, 0x79, 0x70], 4)) {
+        const brand = String.fromCharCode(...bytes.slice(8, 12));
+        if (brand === 'avif' || brand === 'avis') {
+            return 'image/avif';
+        }
+    }
+    return undefined;
+}
+
 function normalizeUpstreamUrl(url: URL): URL {
     const normalizedUrl = new URL(url.toString());
     if (normalizedUrl.protocol === 'http:') {
@@ -185,26 +231,49 @@ export async function GET(request: NextRequest) {
         return response;
     }
 
-    const contentType = upstreamResponse.headers.get('content-type') || '';
-    if (!contentType.toLowerCase().startsWith('image/')) {
+    const upstreamContentType = (upstreamResponse.headers.get('content-type') || '')
+        .split(';')[0]
+        .trim()
+        .toLowerCase();
+
+    // Content-Type 已经说是图片就直接透传，省掉把整张图读进内存
+    if (upstreamContentType.startsWith('image/')) {
+        const headers = new Headers();
+        headers.set('Content-Type', upstreamContentType);
+        headers.set('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
+        headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+        setXRobotsTag(headers, ['noindex', 'nofollow', 'noarchive', 'noimageindex']);
+
+        const contentLength = upstreamResponse.headers.get('content-length');
+        if (contentLength) {
+            headers.set('Content-Length', contentLength);
+        }
+
+        return new NextResponse(upstreamResponse.body, { status: 200, headers });
+    }
+
+    // 只有笼统的二进制类型才值得再嗅一次；text/html、application/json 这类
+    // 明确不是图片的直接拒掉，不用把响应体读进来。
+    if (!GENERIC_BINARY_CONTENT_TYPES.has(upstreamContentType)) {
+        const response = NextResponse.json({ error: 'Upstream response is not an image' }, { status: 415 });
+        setXRobotsTag(response.headers, ['noindex', 'nofollow', 'noarchive', 'noimageindex']);
+        return response;
+    }
+
+    const buffer = new Uint8Array(await upstreamResponse.arrayBuffer());
+    const sniffedContentType = sniffImageContentType(buffer);
+    if (!sniffedContentType) {
         const response = NextResponse.json({ error: 'Upstream response is not an image' }, { status: 415 });
         setXRobotsTag(response.headers, ['noindex', 'nofollow', 'noarchive', 'noimageindex']);
         return response;
     }
 
     const headers = new Headers();
-    headers.set('Content-Type', contentType);
+    headers.set('Content-Type', sniffedContentType);
+    headers.set('Content-Length', String(buffer.byteLength));
     headers.set('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     headers.set('Cross-Origin-Resource-Policy', 'same-origin');
     setXRobotsTag(headers, ['noindex', 'nofollow', 'noarchive', 'noimageindex']);
 
-    const contentLength = upstreamResponse.headers.get('content-length');
-    if (contentLength) {
-        headers.set('Content-Length', contentLength);
-    }
-
-    return new NextResponse(upstreamResponse.body, {
-        status: 200,
-        headers,
-    });
+    return new NextResponse(buffer, { status: 200, headers });
 }

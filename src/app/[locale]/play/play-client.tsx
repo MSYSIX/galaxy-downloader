@@ -12,7 +12,7 @@ import { ViewportSideRailAd } from '@/components/ads/viewport-side-rail-ad'
 import { buildMediaPreviewUrl, buildResultPreviewForSelection } from '@/components/downloader/media-preview'
 import { useAppLocale, useDictionary } from '@/i18n/client'
 import { isApiRequestError, resolveApiErrorMessage } from '@/lib/api-errors'
-import { buildHlsPlayProxyUrl, HLS_PLAYLIST_ACCEPT, isHlsPlaylistUrl } from '@/lib/hls-playback'
+import { isHlsPlaylistUrl } from '@/lib/hls-playback'
 import { UnifiedParseReloadError, requestUnifiedParse } from '@/lib/unified-parse'
 import type { UnifiedParseResult } from '@/lib/types'
 import { normalizePlatform } from '@/lib/platforms'
@@ -103,17 +103,16 @@ export function PlayPageClient() {
             return null
         }
 
-        const playlistUrl = visibleParseResult?.originDownloadVideoUrl?.trim()
-        if (!playlistUrl || !isHlsPlaylistUrl(playlistUrl)) {
+        const originPlaylistUrl = visibleParseResult?.originDownloadVideoUrl?.trim()
+        const workerPlaylistUrl = visibleParseResult?.downloadVideoUrl?.trim()
+        const isHlsVideo = visibleParseResult?.mediaActions?.video === 'browser-hls-download'
+            || isHlsPlaylistUrl(originPlaylistUrl)
+        if (!workerPlaylistUrl || !isHlsVideo) {
             return null
         }
 
-        return buildHlsPlayProxyUrl(
-            playlistUrl,
-            canonicalSourceUrl || playlistUrl,
-            HLS_PLAYLIST_ACCEPT
-        )
-    }, [canonicalSourceUrl, selectedPreview, visibleParseResult])
+        return workerPlaylistUrl
+    }, [selectedPreview, visibleParseResult])
     const playbackUrl = useMemo(() => {
         if (hlsPlaybackUrl) {
             return hlsPlaybackUrl

@@ -53,6 +53,7 @@ export function CollectionItemActions({
                             text={dict.result.playVideo}
                             icon={Play}
                             variant="secondary"
+                            size="xs"
                             className="w-full"
                             onClick={() => onPlay('video')}
                         />
@@ -63,6 +64,7 @@ export function CollectionItemActions({
                             text={dict.result.playAudio}
                             icon={Headphones}
                             variant="secondary"
+                            size="xs"
                             className="w-full"
                             onClick={() => onPlay('audio')}
                         />
@@ -77,6 +79,7 @@ export function CollectionItemActions({
                             text={dict.result.downloadVideo}
                             icon={VideoDownloadIcon}
                             variant="default"
+                            size="xs"
                             className="w-full"
                             disabled={videoLoading}
                             loading={videoLoading}
@@ -89,6 +92,7 @@ export function CollectionItemActions({
                             text={dict.result.downloadAudio}
                             icon={AudioDownloadIcon}
                             variant="default"
+                            size="xs"
                             className="w-full"
                             disabled={audioLoading}
                             loading={audioLoading}

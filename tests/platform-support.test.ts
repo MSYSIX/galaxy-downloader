@@ -32,28 +32,50 @@ const dict = {
             twitch: { name: 'Twitch', summary: 'content' },
             soundcloud: { name: 'SoundCloud', summary: 'content' },
             applePodcasts: { name: 'Apple Podcasts', summary: 'public audio' },
+            kuaishou: { name: 'Kuaishou', summary: 'video' },
+            zhihu: { name: 'Zhihu', summary: 'video' },
+            generic: { name: 'Web / HLS', summary: 'web video' },
+            bluesky: { name: 'Bluesky', summary: 'video' },
+            rumble: { name: 'Rumble', summary: 'video' },
+            snapchat: { name: 'Snapchat', summary: 'video' },
+            coub: { name: 'Coub', summary: 'video' },
+            imgur: { name: 'Imgur', summary: 'media' },
+            odysee: { name: 'Odysee', summary: 'video' },
+            rutube: { name: 'Rutube', summary: 'video' },
             comingSoon: 'Coming soon',
         },
     },
 } as const;
 
 describe('getPlatformSupportItems', () => {
-    it('hides platforms that should not be promoted in the support list', () => {
+    it('lists every platform registered by the API and omits retired frontend-only entries', () => {
         const items = getPlatformSupportItems(dict as unknown as Pick<Dictionary, 'guide'>);
 
         const keys = items.map((item) => item.key);
-        expect(keys).not.toContain('bilibili');
-        expect(keys).not.toContain('bilibiliTv');
-        expect(keys).not.toContain('douyin');
-        expect(keys).not.toContain('wechat');
-        expect(keys).not.toContain('weibo');
-        expect(keys).not.toContain('xiaohongshu');
+        expect(keys).toHaveLength(34);
+        expect(keys).toContain('bilibili');
+        expect(keys).toContain('bilibiliTv');
+        expect(keys).toContain('douyin');
+        expect(keys).toContain('wechat');
+        expect(keys).toContain('weibo');
+        expect(keys).toContain('xiaohongshu');
         expect(keys).toContain('tiktok');
-        expect(keys).not.toContain('youtube');
+        expect(keys).toContain('youtube');
         expect(keys).toContain('soundcloud');
         expect(keys).toContain('applePodcasts');
         expect(keys).toContain('vk');
         expect(keys).toContain('okru');
         expect(keys).toContain('pinterest');
+        expect(keys).toContain('rutube');
+        expect(keys).toContain('snapchat');
+        expect(keys).toContain('imgur');
+        expect(keys).not.toContain('newgrounds');
+    });
+
+    it('keeps the API platform order in one compact list', () => {
+        const items = getPlatformSupportItems(dict as unknown as Pick<Dictionary, 'guide'>);
+
+        expect(items.slice(0, 4).map((item) => item.key)).toEqual(['bilibili', 'bilibiliTv', 'douyin', 'generic']);
+        expect(items.slice(-4).map((item) => item.key)).toEqual(['coub', 'imgur', 'odysee', 'rutube']);
     });
 });

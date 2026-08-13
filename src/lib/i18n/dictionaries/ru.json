@@ -251,7 +251,7 @@
         "statusMerging": "Объединение…"
     },
     "hlsDownload": {
-        "description": "Сначала пробуем загружать HLS-сегменты напрямую в браузере. Только неудачные запросы идут через same-origin прокси.",
+        "description": "Ресурсы HLS безопасно передаются через сервис загрузки.",
         "outputTitle": "Имя файла",
         "outputPlaceholder": "Необязательный префикс имени файла",
         "sourceUrl": "URL страницы или m3u8",
@@ -511,7 +511,17 @@
                     "Воспроизведение эпизодов",
                     "Загрузка"
                 ]
-            }
+            },
+            "kuaishou": { "name": "Kuaishou", "summary": "Видео и публикации с изображениями" },
+            "zhihu": { "name": "Zhihu", "summary": "Видеоконтент" },
+            "generic": { "name": "Веб / HLS", "summary": "Поддерживаемые веб-видео и HLS-потоки" },
+            "bluesky": { "name": "Bluesky", "summary": "Видеопубликации" },
+            "rumble": { "name": "Rumble", "summary": "Видеопубликации" },
+            "snapchat": { "name": "Snapchat", "summary": "Видео Spotlight" },
+            "coub": { "name": "Coub", "summary": "Зацикленные видео" },
+            "imgur": { "name": "Imgur", "summary": "Изображения и видеопубликации" },
+            "odysee": { "name": "Odysee", "summary": "Видеопубликации" },
+            "rutube": { "name": "Rutube", "summary": "Видео и HLS-потоки" }
         },
         "linkFormats": {
             "title": "Поддерживаемые форматы ссылок",
@@ -538,6 +548,10 @@
             },
             "tip": "Совет: просто скопируйте ссылку «Поделиться», никаких изменений вручную не требуется."
         }
+    },
+    "todayStats": {
+        "title": "Обработано сегодня",
+        "countLabel": "успешных обработок"
     },
     "freeSupport": {
         "title": "Постоянно бесплатная услуга",

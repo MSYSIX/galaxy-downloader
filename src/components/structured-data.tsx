@@ -8,7 +8,7 @@ import {
     resolvePublicMetadataDescription,
     sanitizeStructuredDataTextList,
 } from '@/lib/seo'
-import { HIDDEN_PLATFORM_SUPPORT_KEYS } from '@/components/downloader/platform-support'
+import { getPlatformSupportItems } from '@/components/downloader/platform-support'
 
 interface StructuredDataProps {
     locale: Locale
@@ -37,21 +37,9 @@ const HIDDEN_PLATFORM_TERMS = [
 ]
 
 function buildPlatformSupportFeatureList(dict: Dictionary): string[] {
-    return Object.entries(dict.guide.platformSupport).flatMap(([key, value]) => {
-        if (
-            key === "title" ||
-            key === "comingSoon" ||
-            HIDDEN_PLATFORM_SUPPORT_KEYS.has(key as never) ||
-            typeof value !== "object" ||
-            value === null ||
-            !("name" in value) ||
-            !("summary" in value)
-        ) {
-            return []
-        }
-
-        const entry = value as PlatformSupportEntry
-        return [`${entry.name}: ${entry.summary}`]
+    return getPlatformSupportItems(dict).map(({ key, name }) => {
+        const entry = dict.guide.platformSupport[key] as PlatformSupportEntry
+        return `${name}: ${entry.summary}`
     })
 }
 

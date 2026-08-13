@@ -10,7 +10,6 @@ import { Progress } from '@/components/ui/progress'
 import { useDictionary } from '@/i18n/client'
 import type { ByteRange, HlsSegment } from '@/lib/hls-browser-download'
 import {
-    buildHlsHostProbeTargets,
     buildRangeHeader,
     decryptAes128Cbc,
     importAes128Key,
@@ -26,8 +25,7 @@ import { sanitizeFilename } from '@/lib/utils'
 
 const DOWNLOAD_CONCURRENCY = 8
 const SEGMENT_DOWNLOAD_RETRIES = 3
-const HOST_PROBE_CONCURRENCY = 2
-const HOST_PROBE_TIMEOUT_MS = 2500
+const MAX_MASTER_PLAYLIST_DEPTH = 8
 
 class HttpStatusError extends Error {
     status: number
@@ -41,7 +39,6 @@ class HttpStatusError extends Error {
 
 type PlaylistResolution = {
     title: string
-    pageUrl: string
     playlistUrl: string
     variantCount: number
     totalSegments: number
@@ -56,25 +53,27 @@ type DownloadSample = {
     timestamp: number
 }
 
-type DirectFetchMode = 'probe' | 'direct-ok' | 'proxy-only'
+type SaveFilePickerOptions = {
+    suggestedName?: string
+    types?: Array<{
+        description?: string
+        accept: Record<string, string[]>
+    }>
+}
+
+type FileSystemAccessWindow = Window & {
+    showSaveFilePicker?: (options: SaveFilePickerOptions) => Promise<FileSystemFileHandle>
+}
 
 export interface HlsBrowserDownloadPanelProps {
     initialSourceUrl: string
-    initialRefererUrl: string
+    initialResolvedPlaylistUrl?: string
     initialTitle?: string
-    autorun?: boolean
     onBusyChange?: (busy: boolean) => void
     onCancelReady?: (cancel: (() => void) | null) => void
 }
 
-function buildProxyUrl(target: string, referer: string, accept?: string): string {
-    const params = new URLSearchParams({ target, referer })
-    if (accept) {
-        params.set('accept', accept)
-    }
-
-    return `/api/hls-download-proxy?${params.toString()}`
-}
+type DownloadPhase = 'preparing' | 'ready' | 'downloading' | 'completed' | 'failed'
 
 function buildFetchHeaders(accept?: string, byterange?: ByteRange): HeadersInit | undefined {
     const headers: Record<string, string> = {}
@@ -110,52 +109,7 @@ function shouldRetryDownload(error: unknown): boolean {
     return true
 }
 
-function resolveHost(url: string): string | null {
-    try {
-        return new URL(url).host
-    } catch {
-        return null
-    }
-}
-
-async function fetchProxyText(
-    target: string,
-    referer: string,
-    signal: AbortSignal,
-    accept?: string
-): Promise<string> {
-    const response = await fetch(buildProxyUrl(target, referer, accept), {
-        cache: 'no-store',
-        signal,
-    })
-
-    if (!response.ok) {
-        throw new HttpStatusError(response.status, `Proxy request failed with HTTP ${response.status}`)
-    }
-
-    return response.text()
-}
-
-async function fetchProxyBytes(
-    target: string,
-    referer: string,
-    signal: AbortSignal,
-    byterange?: ByteRange
-): Promise<Uint8Array> {
-    const response = await fetch(buildProxyUrl(target, referer), {
-        cache: 'no-store',
-        headers: buildFetchHeaders(undefined, byterange),
-        signal,
-    })
-
-    if (!response.ok) {
-        throw new HttpStatusError(response.status, `Proxy request failed with HTTP ${response.status}`)
-    }
-
-    return new Uint8Array(await response.arrayBuffer())
-}
-
-async function fetchDirectText(
+async function fetchWorkerText(
     target: string,
     signal: AbortSignal,
     accept?: string
@@ -167,13 +121,26 @@ async function fetchDirectText(
     })
 
     if (!response.ok) {
-        throw new HttpStatusError(response.status, `Direct request failed with HTTP ${response.status}`)
+        throw new HttpStatusError(response.status, `Worker request failed with HTTP ${response.status}`)
     }
 
     return response.text()
 }
 
-async function fetchDirectBytes(
+function assertWorkerResourceUrl(target: string, workerOrigin: string, allowRoot: boolean): string {
+    const parsed = new URL(target)
+    if (parsed.origin !== workerOrigin) {
+        throw new Error('HLS playlist contains a resource outside the configured Worker origin')
+    }
+
+    if (!allowRoot && parsed.pathname !== '/api/hls-proxy') {
+        throw new Error('HLS playlist contains an unsigned Worker resource URL')
+    }
+
+    return parsed.toString()
+}
+
+async function fetchWorkerBytes(
     target: string,
     signal: AbortSignal,
     byterange?: ByteRange
@@ -185,89 +152,19 @@ async function fetchDirectBytes(
     })
 
     if (!response.ok) {
-        throw new HttpStatusError(response.status, `Direct request failed with HTTP ${response.status}`)
+        throw new HttpStatusError(response.status, `Worker request failed with HTTP ${response.status}`)
     }
 
     return new Uint8Array(await response.arrayBuffer())
 }
 
-async function fetchTextWithFallback(
-    target: string,
-    referer: string,
-    signal: AbortSignal,
-    directFetchModes: Map<string, DirectFetchMode>,
-    accept?: string
-): Promise<string> {
-    const host = resolveHost(target)
-    const directFetchMode = host ? directFetchModes.get(host) ?? 'probe' : 'probe'
-
-    if (directFetchMode === 'proxy-only') {
-        return fetchProxyText(target, referer, signal, accept)
-    }
-
-    try {
-        const text = await fetchDirectText(target, signal, accept)
-        if (host) {
-            directFetchModes.set(host, 'direct-ok')
-        }
-
-        return text
-    } catch (error) {
-        if (isAbortError(error)) {
-            throw error
-        }
-
-        if (host) {
-            directFetchModes.set(host, 'proxy-only')
-        }
-
-        return fetchProxyText(target, referer, signal, accept)
-    }
-}
-
-async function fetchBytesWithFallback(
-    target: string,
-    referer: string,
-    signal: AbortSignal,
-    directFetchModes: Map<string, DirectFetchMode>,
-    byterange?: ByteRange
-): Promise<Uint8Array> {
-    const host = resolveHost(target)
-    const directFetchMode = host ? directFetchModes.get(host) ?? 'probe' : 'probe'
-
-    if (directFetchMode === 'proxy-only') {
-        return fetchProxyBytes(target, referer, signal, byterange)
-    }
-
-    try {
-        const bytes = await fetchDirectBytes(target, signal, byterange)
-        if (host) {
-            directFetchModes.set(host, 'direct-ok')
-        }
-
-        return bytes
-    } catch (error) {
-        if (isAbortError(error)) {
-            throw error
-        }
-
-        if (host) {
-            directFetchModes.set(host, 'proxy-only')
-        }
-
-        return fetchProxyBytes(target, referer, signal, byterange)
-    }
-}
-
 async function fetchBytesWithRetry(
     target: string,
-    referer: string,
     signal: AbortSignal,
-    directFetchModes: Map<string, DirectFetchMode>,
     byterange?: ByteRange
 ): Promise<Uint8Array> {
     return pRetry(
-        () => fetchBytesWithFallback(target, referer, signal, directFetchModes, byterange),
+        () => fetchWorkerBytes(target, signal, byterange),
         {
             retries: SEGMENT_DOWNLOAD_RETRIES,
             factor: 2,
@@ -283,20 +180,15 @@ async function fetchBytesWithRetry(
 async function resolvePlaylist(
     sourceUrl: string,
     signal: AbortSignal,
-    directFetchModes: Map<string, DirectFetchMode>,
-    refererOverride?: string,
+    resolvedPlaylistUrl?: string,
     titleOverride?: string
 ): Promise<PlaylistResolution> {
-    let pageUrl = sourceUrl
-    let playlistUrl = sourceUrl
+    let playlistUrl = resolvedPlaylistUrl?.trim() || ''
     let title = titleOverride?.trim() || ''
 
-    if (/\.m3u8(?:[?#]|$)/i.test(sourceUrl)) {
-        pageUrl = refererOverride?.trim() || sourceUrl
-    } else {
+    if (!playlistUrl) {
         const parsed = await requestUnifiedParse(sourceUrl)
-        playlistUrl = parsed.data.originDownloadVideoUrl || parsed.data.downloadVideoUrl || ''
-        pageUrl = parsed.data.url
+        playlistUrl = parsed.data.downloadVideoUrl || ''
 
         if (!playlistUrl) {
             throw new Error('No playlist URL was returned by /api/parse')
@@ -306,34 +198,46 @@ async function resolvePlaylist(
     }
 
     let activePlaylistUrl = playlistUrl
-    let playlistText = await fetchTextWithFallback(
+    const workerOrigin = new URL(playlistUrl).origin
+    activePlaylistUrl = assertWorkerResourceUrl(activePlaylistUrl, workerOrigin, true)
+    let playlistText = await fetchWorkerText(
         activePlaylistUrl,
-        pageUrl,
         signal,
-        directFetchModes,
         HLS_PLAYLIST_ACCEPT
     )
-    const bestVariant = pickBestVariant(playlistText, activePlaylistUrl)
-
-    if (bestVariant) {
-        activePlaylistUrl = bestVariant.url
-        playlistText = await fetchTextWithFallback(
+    let variantCount = 0
+    for (; variantCount < MAX_MASTER_PLAYLIST_DEPTH; variantCount += 1) {
+        const bestVariant = pickBestVariant(playlistText, activePlaylistUrl)
+        if (!bestVariant) {
+            break
+        }
+        activePlaylistUrl = assertWorkerResourceUrl(bestVariant.url, workerOrigin, false)
+        playlistText = await fetchWorkerText(
             activePlaylistUrl,
-            pageUrl,
             signal,
-            directFetchModes,
             HLS_PLAYLIST_ACCEPT
         )
     }
 
+    if (pickBestVariant(playlistText, activePlaylistUrl)) {
+        throw new Error('HLS master playlist nesting is too deep')
+    }
+
     const mediaPlaylist = parseHlsMediaPlaylist(playlistText, activePlaylistUrl)
+    for (const resourceUrl of [
+        mediaPlaylist.mapUrl,
+        ...mediaPlaylist.segments.flatMap((segment) => [segment.url, segment.keyUrl])
+    ]) {
+        if (resourceUrl) {
+            assertWorkerResourceUrl(resourceUrl, workerOrigin, false)
+        }
+    }
     const selectedSegments = sliceHlsSegments(mediaPlaylist.segments)
 
     return {
         title,
-        pageUrl,
         playlistUrl: activePlaylistUrl,
-        variantCount: bestVariant ? 1 : 0,
+        variantCount,
         totalSegments: mediaPlaylist.segments.length,
         selectedSegments,
         mapUrl: mediaPlaylist.mapUrl,
@@ -362,103 +266,15 @@ async function runWithConcurrency<T>(
     )
 }
 
-function createProbeSignal(signal: AbortSignal, timeoutMs: number): {
-    signal: AbortSignal
-    cleanup: () => void
-} {
-    const controller = new AbortController()
-    const forwardAbort = () => {
-        controller.abort(signal.reason)
-    }
-
-    if (signal.aborted) {
-        controller.abort(signal.reason)
-    } else {
-        signal.addEventListener('abort', forwardAbort, { once: true })
-    }
-
-    const timeoutId = setTimeout(() => {
-        controller.abort(new DOMException('Timed out', 'AbortError'))
-    }, timeoutMs)
-
-    return {
-        signal: controller.signal,
-        cleanup: () => {
-            clearTimeout(timeoutId)
-            signal.removeEventListener('abort', forwardAbort)
-        },
-    }
-}
-
-async function probeHostDirectAccess(
-    target: string,
-    signal: AbortSignal,
-    byterange?: ByteRange
-): Promise<boolean> {
-    const { signal: probeSignal, cleanup } = createProbeSignal(signal, HOST_PROBE_TIMEOUT_MS)
-
-    try {
-        const response = await fetch(target, {
-            cache: 'no-store',
-            headers: buildFetchHeaders(undefined, byterange),
-            signal: probeSignal,
-        })
-
-        if (!response.ok) {
-            throw new HttpStatusError(response.status, `Direct probe failed with HTTP ${response.status}`)
-        }
-
-        await response.body?.cancel()
-        return true
-    } catch (error) {
-        if (signal.aborted && isAbortError(error)) {
-            throw error
-        }
-
-        return false
-    } finally {
-        cleanup()
-    }
-}
-
-async function probePlaylistHosts(
-    resolution: PlaylistResolution,
-    signal: AbortSignal,
-    directFetchModes: Map<string, DirectFetchMode>
-): Promise<void> {
-    const probeTargets = buildHlsHostProbeTargets(
-        resolution.mapUrl,
-        resolution.mapByterange,
-        resolution.selectedSegments
-    )
-
-    await runWithConcurrency(probeTargets, HOST_PROBE_CONCURRENCY, async (probeTarget) => {
-        const currentMode = directFetchModes.get(probeTarget.host)
-        if (currentMode === 'direct-ok' || currentMode === 'proxy-only') {
-            return
-        }
-
-        const directAccessible = await probeHostDirectAccess(
-            probeTarget.url,
-            signal,
-            probeTarget.byterange
-        )
-
-        directFetchModes.set(probeTarget.host, directAccessible ? 'direct-ok' : 'proxy-only')
-    })
-}
-
 function createStreamingDownloadResponse({
     targets,
     resolution,
     signal,
-    directFetchModes,
     onChunkDownloaded,
 }: {
     targets: Array<{ url: string; byterange?: ByteRange; keyUrl?: string; iv?: Uint8Array }>
     resolution: PlaylistResolution
     signal: AbortSignal
-    directFetchModes: Map<string, DirectFetchMode>
     onChunkDownloaded: (bytes: number) => void
 }): Response {
     const keyCache = new Map<string, Promise<CryptoKey>>()
@@ -494,9 +310,7 @@ function createStreamingDownloadResponse({
                     await runWithConcurrency(targets, DOWNLOAD_CONCURRENCY, async (target, index) => {
                         const bytes = await fetchBytesWithRetry(
                             target.url,
-                            resolution.pageUrl,
                             signal,
-                            directFetchModes,
                             target.byterange
                         )
 
@@ -510,9 +324,7 @@ function createStreamingDownloadResponse({
                                 keyCache.set(target.keyUrl, (async () => {
                                     const rawKey = await fetchBytesWithRetry(
                                         target.keyUrl!,
-                                        resolution.pageUrl,
-                                        signal,
-                                        directFetchModes
+                                        signal
                                     )
                                     return importAes128Key(rawKey)
                                 })())
@@ -564,27 +376,45 @@ function formatEta(seconds: number): string {
     return [minutes, remainingSeconds].map((value) => String(value).padStart(2, '0')).join(':')
 }
 
+function openSaveFilePicker(
+    fileName: string,
+    extension: string,
+    mimeType: string
+): Promise<FileSystemFileHandle | null> {
+    const browserWindow = window as FileSystemAccessWindow
+    if (!browserWindow.showSaveFilePicker) {
+        return Promise.resolve(null)
+    }
+
+    return browserWindow.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+            description: 'Video files',
+            accept: { [mimeType]: [`.${extension}`] },
+        }],
+    })
+}
+
 export function HlsBrowserDownloadPanel({
     initialSourceUrl,
-    initialRefererUrl,
+    initialResolvedPlaylistUrl,
     initialTitle = '',
-    autorun = false,
     onBusyChange,
     onCancelReady,
 }: HlsBrowserDownloadPanelProps) {
     const dict = useDictionary()
-    const [status, setStatus] = useState(dict.hlsDownload.idleStatus)
-    const [resolveLoading, setResolveLoading] = useState(false)
-    const [downloadLoading, setDownloadLoading] = useState(false)
+    const [phase, setPhase] = useState<DownloadPhase>('preparing')
+    const [status, setStatus] = useState(dict.hlsDownload.resolvingStatus)
     const [progress, setProgress] = useState(0)
-    const [failed, setFailed] = useState(false)
     const [speedBytesPerSecond, setSpeedBytesPerSecond] = useState<number | null>(null)
     const [etaSeconds, setEtaSeconds] = useState<number | null>(null)
-    const autorunTriggeredRef = useRef(false)
+    const [resolution, setResolution] = useState<PlaylistResolution | null>(null)
     const mountedRef = useRef(true)
     const activeAbortControllerRef = useRef<AbortController | null>(null)
     const downloadSamplesRef = useRef<DownloadSample[]>([])
-    const isBusy = resolveLoading || downloadLoading
+    const taskVersionRef = useRef(0)
+    const isBusy = phase === 'preparing' || phase === 'downloading'
+    const failed = phase === 'failed'
 
     useEffect(() => {
         onBusyChange?.(isBusy)
@@ -601,7 +431,8 @@ export function HlsBrowserDownloadPanel({
         activeAbortControllerRef.current?.abort()
         const controller = new AbortController()
         activeAbortControllerRef.current = controller
-        return controller
+        taskVersionRef.current += 1
+        return { controller, version: taskVersionRef.current }
     }, [])
 
     const finishTask = useCallback((controller: AbortController) => {
@@ -612,6 +443,7 @@ export function HlsBrowserDownloadPanel({
 
     const cancelActiveTask = useCallback(() => {
         activeAbortControllerRef.current?.abort()
+        taskVersionRef.current += 1
     }, [])
 
     useEffect(() => {
@@ -622,47 +454,85 @@ export function HlsBrowserDownloadPanel({
         }
     }, [cancelActiveTask, onCancelReady])
 
-    const handleStart = useCallback(async (): Promise<void> => {
-        const controller = startTask()
-        const directFetchModes = new Map<string, DirectFetchMode>()
-
-        setResolveLoading(true)
-        setDownloadLoading(false)
-        setFailed(false)
+    const resetDownloadMetrics = useCallback(() => {
         setProgress(0)
         setSpeedBytesPerSecond(null)
         setEtaSeconds(null)
         downloadSamplesRef.current = []
+    }, [])
+
+    const preparePlaylist = useCallback(async (): Promise<void> => {
+        const { controller, version } = startTask()
+        setPhase('preparing')
+        setResolution(null)
+        resetDownloadMetrics()
         setStatus(dict.hlsDownload.resolvingStatus)
 
         try {
-            const resolution = await resolvePlaylist(
+            const nextResolution = await resolvePlaylist(
                 initialSourceUrl.trim(),
                 controller.signal,
-                directFetchModes,
-                initialRefererUrl.trim(),
+                initialResolvedPlaylistUrl?.trim(),
                 initialTitle.trim()
             )
 
-            if (!mountedRef.current) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
             }
 
             if (shouldBlockLargeHlsDownloadWithoutStreamingSave(
-                resolution.selectedSegments.length,
+                nextResolution.selectedSegments.length,
                 supportsStreamingFileSave
             )) {
                 setStatus(dict.hlsDownload.largeVideoBrowserLimitedStatus)
-                setFailed(true)
+                setPhase('failed')
                 return
             }
 
-            await probePlaylistHosts(resolution, controller.signal, directFetchModes)
+            setResolution(nextResolution)
+            setPhase('ready')
+            setStatus(dict.hlsDownload.idleStatus)
+        } catch (error) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
+                return
+            }
 
-            setResolveLoading(false)
-            setDownloadLoading(true)
-            setStatus(dict.hlsDownload.downloadingStatus)
+            if (isAbortError(error)) {
+                setPhase('ready')
+                setStatus(dict.hlsDownload.idleStatus)
+                return
+            }
 
+            setPhase('failed')
+            setStatus(dict.hlsDownload.downloadFailedStatus)
+            console.error('Browser HLS playlist preparation failed:', error)
+        } finally {
+            finishTask(controller)
+        }
+    }, [dict.hlsDownload.downloadFailedStatus, dict.hlsDownload.idleStatus, dict.hlsDownload.largeVideoBrowserLimitedStatus, dict.hlsDownload.resolvingStatus, finishTask, initialResolvedPlaylistUrl, initialSourceUrl, initialTitle, resetDownloadMetrics, startTask])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void preparePlaylist()
+        }, 0)
+
+        return () => {
+            window.clearTimeout(timer)
+            cancelActiveTask()
+        }
+    }, [cancelActiveTask, preparePlaylist])
+
+    const handleStart = useCallback(async (): Promise<void> => {
+        if (!resolution) {
+            return
+        }
+
+        const { controller, version } = startTask()
+        setPhase('downloading')
+        resetDownloadMetrics()
+        setStatus(dict.hlsDownload.downloadingStatus)
+
+        try {
             const targets = [
                 ...(resolution.mapUrl
                     ? [{
@@ -678,19 +548,21 @@ export function HlsBrowserDownloadPanel({
             const baseTitle = sanitizeFilename(initialTitle || resolution.title || dict.history.unknownTitle)
             const outputName = `${baseTitle || 'hls-browser-download'}-${resolution.selectedSegments.length}-segments.${extension}`
             const mimeType = extension === 'mp4' ? 'video/mp4' : 'video/mp2t'
+            // Must run before the first await so Chromium preserves the click's user activation.
+            const fileHandlePromise = openSaveFilePicker(outputName, extension, mimeType)
+            const fileHandle = await fileHandlePromise
 
             const response = createStreamingDownloadResponse({
                 targets,
                 resolution,
                 signal: controller.signal,
-                directFetchModes,
                 onChunkDownloaded: (bytes) => {
-                    completed += 1
-                    downloadedBytes += bytes
-
-                    if (!mountedRef.current) {
+                    if (!mountedRef.current || taskVersionRef.current !== version || controller.signal.aborted) {
                         return
                     }
+
+                    completed += 1
+                    downloadedBytes += bytes
 
                     const now = Date.now()
                     downloadSamplesRef.current = [
@@ -727,45 +599,37 @@ export function HlsBrowserDownloadPanel({
                 fileName: outputName,
                 extensions: [`.${extension}`],
                 mimeTypes: [mimeType],
-            })
+            }, fileHandle, true)
 
-            if (!mountedRef.current) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
             }
 
             setProgress(100)
             setEtaSeconds(0)
+            setPhase('completed')
             setStatus(dict.hlsDownload.downloadCompletedStatus)
         } catch (error) {
-            if (!mountedRef.current) {
+            if (!mountedRef.current || taskVersionRef.current !== version) {
                 return
             }
 
             if (isAbortError(error)) {
+                resetDownloadMetrics()
+                setPhase('ready')
                 setStatus(dict.hlsDownload.idleStatus)
                 return
             }
 
+            cancelActiveTask()
+            resetDownloadMetrics()
+            setPhase('failed')
             setStatus(dict.hlsDownload.downloadFailedStatus)
-            setFailed(true)
             console.error('Browser HLS download failed:', error)
         } finally {
             finishTask(controller)
-            if (mountedRef.current) {
-                setResolveLoading(false)
-                setDownloadLoading(false)
-            }
         }
-    }, [dict.history.unknownTitle, dict.hlsDownload.downloadCompletedStatus, dict.hlsDownload.downloadFailedStatus, dict.hlsDownload.downloadingStatus, dict.hlsDownload.idleStatus, dict.hlsDownload.largeVideoBrowserLimitedStatus, dict.hlsDownload.resolvingStatus, finishTask, initialRefererUrl, initialSourceUrl, initialTitle, startTask])
-
-    useEffect(() => {
-        if (autorun && initialSourceUrl && !autorunTriggeredRef.current) {
-            autorunTriggeredRef.current = true
-            window.setTimeout(() => {
-                void handleStart()
-            }, 0)
-        }
-    }, [autorun, handleStart, initialSourceUrl])
+    }, [cancelActiveTask, dict.history.unknownTitle, dict.hlsDownload.downloadCompletedStatus, dict.hlsDownload.downloadFailedStatus, dict.hlsDownload.downloadingStatus, dict.hlsDownload.idleStatus, finishTask, initialTitle, resetDownloadMetrics, resolution, startTask])
 
     return (
         <div className="space-y-5">
@@ -810,9 +674,19 @@ export function HlsBrowserDownloadPanel({
                 </div>
             </div>
 
-            {failed || (!autorun && !isBusy && progress === 0) ? (
+            {!isBusy && phase !== 'completed' ? (
                 <div className="flex justify-end">
-                    <Button onClick={() => void handleStart()} disabled={isBusy}>
+                    <Button
+                        onClick={() => {
+                            if (phase === 'failed') {
+                                void preparePlaylist()
+                                return
+                            }
+
+                            void handleStart()
+                        }}
+                        disabled={phase !== 'ready' && phase !== 'failed'}
+                    >
                         {isBusy ? dict.hlsDownload.downloadingButton : dict.hlsDownload.downloadButton}
                     </Button>
                 </div>
