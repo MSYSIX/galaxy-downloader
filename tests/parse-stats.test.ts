@@ -31,6 +31,23 @@ describe('fetchTodayParseStats', () => {
         expect(fetchMock).toHaveBeenCalledTimes(1)
     })
 
+    it('adds a cache buster for an immediate refresh', async () => {
+        const fetchMock = mockFetch({ success: true, data: {
+            date: '2026-08-13',
+            timezone: 'UTC+08:00',
+            windowStart: '2026-08-12T16:00:00.000Z',
+            windowEnd: '2026-08-13T16:00:00.000Z',
+            count: 1234,
+        } })
+
+        await fetchTodayParseStats({ cacheBuster: 'parse-complete' })
+
+        expect(fetchMock).toHaveBeenCalledWith(
+            '/api/stats/today?refresh=parse-complete',
+            expect.any(Object)
+        )
+    })
+
     it('returns null on a non-ok response', async () => {
         mockFetch({ success: false }, { ok: false })
 

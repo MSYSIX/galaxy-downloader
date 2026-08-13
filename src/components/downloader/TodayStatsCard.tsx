@@ -3,8 +3,14 @@
 import { useEffect, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchTodayParseStats, type TodayParseStats } from '@/lib/parse-stats';
+import {
+    fetchTodayParseStats,
+    TODAY_PARSE_STATS_REFRESH_EVENT,
+    type TodayParseStats,
+} from '@/lib/parse-stats';
 import type { Dictionary } from '@/lib/i18n/types';
+
+const STATS_REFRESH_INTERVAL_MS = 60_000;
 
 interface TodayStatsCardProps {
     dict: Pick<Dictionary, 'todayStats'>;
@@ -14,16 +20,41 @@ export function TodayStatsCard({ dict }: TodayStatsCardProps) {
     const [stats, setStats] = useState<TodayParseStats | null>(null);
 
     useEffect(() => {
-        const controller = new AbortController();
+        let disposed = false;
+        let latestRequestId = 0;
+        const controllers = new Set<AbortController>();
 
-        fetchTodayParseStats({ signal: controller.signal }).then((result) => {
-            if (!controller.signal.aborted) {
-                setStats(result);
-            }
-        });
+        const refreshStats = (cacheBuster?: string | number) => {
+            const requestId = latestRequestId + 1;
+            latestRequestId = requestId;
+            const controller = new AbortController();
+            controllers.add(controller);
+
+            void fetchTodayParseStats({ signal: controller.signal, cacheBuster })
+                .then((result) => {
+                    if (!disposed && !controller.signal.aborted && requestId === latestRequestId) {
+                        setStats(result);
+                    }
+                })
+                .finally(() => {
+                    controllers.delete(controller);
+                });
+        };
+
+        const handleParseSuccess = (event: Event) => {
+            const cacheBuster = (event as CustomEvent<number>).detail || Date.now();
+            refreshStats(cacheBuster);
+        };
+
+        refreshStats();
+        const intervalId = window.setInterval(refreshStats, STATS_REFRESH_INTERVAL_MS);
+        window.addEventListener(TODAY_PARSE_STATS_REFRESH_EVENT, handleParseSuccess);
 
         return () => {
-            controller.abort();
+            disposed = true;
+            window.clearInterval(intervalId);
+            window.removeEventListener(TODAY_PARSE_STATS_REFRESH_EVENT, handleParseSuccess);
+            controllers.forEach((controller) => controller.abort());
         };
     }, []);
 

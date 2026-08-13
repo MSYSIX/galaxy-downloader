@@ -1,5 +1,6 @@
 import { ApiRequestError } from '@/lib/api-errors'
 import { API_ENDPOINTS } from '@/lib/config'
+import { notifyTodayParseStatsChanged } from '@/lib/parse-stats'
 import type { UnifiedParseResult } from '@/lib/types'
 
 const UNIFIED_PARSE_RELOAD_THRESHOLD = 60
@@ -67,5 +68,6 @@ export async function requestUnifiedParse(videoUrl: string): Promise<UnifiedPars
         })
     }
 
+    notifyTodayParseStatsChanged()
     return payload as UnifiedParseSuccessResult
 }
