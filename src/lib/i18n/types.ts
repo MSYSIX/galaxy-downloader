@@ -501,7 +501,8 @@ export interface Dictionary {
     };
     todayStats: {
         title: string;
-        countLabel: string;
+        todayCountLabel: string;
+        totalCountLabel: string;
     };
     freeSupport: {
         title: string;

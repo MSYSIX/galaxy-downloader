@@ -550,8 +550,9 @@
         }
     },
     "todayStats": {
-        "title": "Analizados hoy",
-        "countLabel": "análisis exitosos"
+        "title": "Estadísticas de análisis",
+        "todayCountLabel": "Hoy",
+        "totalCountLabel": "Total"
     },
     "freeSupport": {
         "title": "Servicio permanentemente gratuito",

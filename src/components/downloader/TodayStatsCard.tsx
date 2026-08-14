@@ -25,8 +25,8 @@ interface TodayStatsCardProps {
 
 export function TodayStatsCard({ dict }: TodayStatsCardProps) {
     const [stats, setStats] = useState<TodayParseStats | null>(null);
-    const [displayCount, setDisplayCount] = useState(0);
-    const displayedCountRef = useRef<number | null>(null);
+    const [displayCounts, setDisplayCounts] = useState({ today: 0, total: 0 });
+    const displayedCountsRef = useRef<{ today: number; total: number } | null>(null);
     const animationFrameRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -43,9 +43,10 @@ export function TodayStatsCard({ dict }: TodayStatsCardProps) {
             void fetchTodayParseStats({ signal: controller.signal, cacheBuster })
                 .then((result) => {
                     if (!disposed && !controller.signal.aborted && requestId === latestRequestId) {
-                        if (result && displayedCountRef.current === null) {
-                            displayedCountRef.current = result.count;
-                            setDisplayCount(result.count);
+                        if (result && displayedCountsRef.current === null) {
+                            const initialCounts = { today: result.count, total: result.totalCount };
+                            displayedCountsRef.current = initialCounts;
+                            setDisplayCounts(initialCounts);
                         }
                         setStats(result);
                     }
@@ -73,20 +74,25 @@ export function TodayStatsCard({ dict }: TodayStatsCardProps) {
     }, []);
 
     useEffect(() => {
-        const targetCount = stats?.count;
-        if (targetCount === undefined) {
+        if (!stats) {
             return;
         }
 
-        const previousCount = displayedCountRef.current;
+        const targetCounts = { today: stats.count, total: stats.totalCount };
+
+        const previousCounts = displayedCountsRef.current;
+        const shouldAnimateToday = previousCounts !== null && targetCounts.today > previousCounts.today;
+        const shouldAnimateTotal = previousCounts !== null && targetCounts.total > previousCounts.total;
         if (animationFrameRef.current !== null) {
             window.cancelAnimationFrame(animationFrameRef.current);
             animationFrameRef.current = null;
         }
 
-        if (previousCount === null || targetCount <= previousCount || prefersReducedMotion()) {
-            displayedCountRef.current = targetCount;
-            setDisplayCount(targetCount);
+        if (previousCounts === null
+            || (!shouldAnimateToday && !shouldAnimateTotal)
+            || prefersReducedMotion()) {
+            displayedCountsRef.current = targetCounts;
+            setDisplayCounts(targetCounts);
             return;
         }
 
@@ -94,10 +100,17 @@ export function TodayStatsCard({ dict }: TodayStatsCardProps) {
         const updateCount = (now: number) => {
             const progress = Math.min(1, (now - startedAt) / COUNT_ANIMATION_DURATION_MS);
             const easedProgress = 1 - Math.pow(1 - progress, 3);
-            const nextCount = Math.round(previousCount + (targetCount - previousCount) * easedProgress);
+            const nextCounts = {
+                today: shouldAnimateToday
+                    ? Math.round(previousCounts.today + (targetCounts.today - previousCounts.today) * easedProgress)
+                    : targetCounts.today,
+                total: shouldAnimateTotal
+                    ? Math.round(previousCounts.total + (targetCounts.total - previousCounts.total) * easedProgress)
+                    : targetCounts.total,
+            };
 
-            displayedCountRef.current = nextCount;
-            setDisplayCount(nextCount);
+            displayedCountsRef.current = nextCounts;
+            setDisplayCounts(nextCounts);
 
             if (progress < 1) {
                 animationFrameRef.current = window.requestAnimationFrame(updateCount);
@@ -113,10 +126,10 @@ export function TodayStatsCard({ dict }: TodayStatsCardProps) {
                 animationFrameRef.current = null;
             }
         };
-    }, [stats?.count]);
+    }, [stats]);
 
-    // 拉取失败或今日尚无数据时不占位，避免展示 0
-    if (!stats || stats.count <= 0) {
+    // 拉取失败时不占位，避免显示不可靠的统计数据。
+    if (!stats) {
         return null;
     }
 
@@ -128,15 +141,23 @@ export function TodayStatsCard({ dict }: TodayStatsCardProps) {
                     {dict.todayStats.title}
                 </CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-3xl font-semibold tabular-nums tracking-tight">
-                        {displayCount.toLocaleString()}
-                    </span>
-                    <span className="text-sm text-foreground/75">
-                        {dict.todayStats.countLabel}
-                    </span>
-                </p>
+            <CardContent className="grid grid-cols-2 gap-6">
+                <div className="min-w-0">
+                    <p className="break-words text-sm text-foreground/75">
+                        {dict.todayStats.totalCountLabel}
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight">
+                        {displayCounts.total.toLocaleString()}
+                    </p>
+                </div>
+                <div className="min-w-0">
+                    <p className="break-words text-sm text-foreground/75">
+                        {dict.todayStats.todayCountLabel}
+                    </p>
+                    <p className="mt-2 text-2xl font-medium tabular-nums">
+                        {displayCounts.today.toLocaleString()}
+                    </p>
+                </div>
             </CardContent>
         </Card>
     );

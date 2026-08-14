@@ -550,8 +550,9 @@
         }
     },
     "todayStats": {
-        "title": "Обработано сегодня",
-        "countLabel": "успешных обработок"
+        "title": "Статистика обработки",
+        "todayCountLabel": "Сегодня",
+        "totalCountLabel": "Всего"
     },
     "freeSupport": {
         "title": "Постоянно бесплатная услуга",

@@ -550,8 +550,9 @@
         }
     },
     "todayStats": {
-        "title": "本日の解析",
-        "countLabel": "件の解析成功"
+        "title": "解析統計",
+        "todayCountLabel": "今日",
+        "totalCountLabel": "累計"
     },
     "freeSupport": {
         "title": "永久無料サービス",

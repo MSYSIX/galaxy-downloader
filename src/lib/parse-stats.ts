@@ -9,6 +9,7 @@ export interface TodayParseStats {
     windowStart: string
     windowEnd: string
     count: number
+    totalCount: number
 }
 
 function isTodayParseStats(value: unknown): value is TodayParseStats {
@@ -21,6 +22,9 @@ function isTodayParseStats(value: unknown): value is TodayParseStats {
         && typeof candidate.count === 'number'
         && Number.isFinite(candidate.count)
         && candidate.count >= 0
+        && typeof candidate.totalCount === 'number'
+        && Number.isFinite(candidate.totalCount)
+        && candidate.totalCount >= 0
 }
 
 /**

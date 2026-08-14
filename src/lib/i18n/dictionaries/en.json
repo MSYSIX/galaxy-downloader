@@ -550,8 +550,9 @@
         }
     },
     "todayStats": {
-        "title": "Parsed Today",
-        "countLabel": "successful parses"
+        "title": "Parse Statistics",
+        "todayCountLabel": "Today",
+        "totalCountLabel": "Total"
     },
     "freeSupport": {
         "title": "Permanently Free Service",

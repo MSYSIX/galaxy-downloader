@@ -550,8 +550,9 @@
         }
     },
     "todayStats": {
-        "title": "今日解析",
-        "countLabel": "次成功解析"
+        "title": "解析统计",
+        "todayCountLabel": "今日",
+        "totalCountLabel": "累计"
     },
     "freeSupport": {
         "title": "永久免费服务",
