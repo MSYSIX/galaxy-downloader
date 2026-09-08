@@ -110,10 +110,24 @@ function sniffImageContentType(bytes: Uint8Array): string | undefined {
     return undefined;
 }
 
+// archive.biliimg.com serves bilibili collection covers but answers this
+// worker's egress with 412; the same /bfs/ path on i0.hdslb.com returns 200.
+// The API normalizes these at the source, so this only covers cached or
+// third-party responses that still carry the biliimg host.
+const BILIBILI_IMAGE_HOST = 'i0.hdslb.com';
+
+function isBiliimgHost(hostname: string): boolean {
+    const normalized = hostname.toLowerCase();
+    return normalized === 'biliimg.com' || normalized.endsWith('.biliimg.com');
+}
+
 function normalizeUpstreamUrl(url: URL): URL {
     const normalizedUrl = new URL(url.toString());
     if (normalizedUrl.protocol === 'http:') {
         normalizedUrl.protocol = 'https:';
+    }
+    if (isBiliimgHost(normalizedUrl.hostname)) {
+        normalizedUrl.hostname = BILIBILI_IMAGE_HOST;
     }
     return normalizedUrl;
 }
