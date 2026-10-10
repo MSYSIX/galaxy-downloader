@@ -2,6 +2,18 @@
 
 这是一个基于 [vinext](https://github.com/cloudflare/vinext) 运行的 Next.js App Router 兼容项目，支持从 Bilibili、抖音、Instagram、小红书、TikTok、X、Telegram、Threads、微信公众号、微博、Niconico、Vimeo、Dailymotion、Streamable、Reddit、Newgrounds、Tumblr、Pinterest、VK、OK.ru、Twitch、SoundCloud 等平台下载媒体内容。
 
+## 许可证
+
+本项目原创材料采用自定义的 **galaxy-downloader 个人使用及免费公开服务许可证**，完整条款见 [LICENSE](./LICENSE)。这是源码可用许可证，包含商业使用限制，不属于 OSI 定义的开源许可证。
+
+- 允许个人非商业使用、学习、研究及二次开发。
+- 允许个人免费向公众提供非商业下载服务，包括服务运行所必需的浏览器客户端文件传输。
+- 修改后的源码无需公开；除上述免费公开服务外，修改版仅限本人使用，不得向他人发布修改版的源码、安装包、容器镜像或独立部署包。
+- 收费、广告变现、付费会员、商业产品集成，以及用于企业经营或内部业务等商业用途，均须事先取得有权授权的版权人的明确书面授权。商业使用依照单独授权条款进行。
+- 保留已有的版权及许可声明。第三方材料遵循各自许可证，不受本项目非商业限制的重新约束。
+
+特别说明：`@ffmpeg/core 0.12.9` 声明采用 `GPL-2.0-or-later`；`@ffmpeg/ffmpeg` 和 `@ffmpeg/util` 采用 MIT 许可证。提供这些组件或其修改版时，仍需履行适用的许可、声明和对应源码提供义务。“修改后的源码无需公开”不豁免第三方许可证的要求。参见 [ffmpeg.wasm 官方许可说明](https://ffmpegwasm.netlify.app/docs/faq/#what-is-the-license-of-ffmpegwasm)。
+
 ## 功能特点
 
 - 🎵 支持 Bilibili 视频/音频下载
