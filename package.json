@@ -2,6 +2,7 @@
   "name": "bilibili-audio-downloader",
   "packageManager": "pnpm@11.8.0",
   "version": "2.0.0",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "prepare:ffmpeg-core": "node scripts/sync-ffmpeg-core.mjs",
     "pretest": "pnpm run prepare:ffmpeg-core",
