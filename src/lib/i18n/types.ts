@@ -69,7 +69,33 @@ export interface StaticPageMetaDict {
     intro: string;
 }
 
+export interface DesktopDownloadDict {
+    trigger: string;
+    title: string;
+    description: string;
+    benefits: Record<'local' | 'batch' | 'ready', { title: string; description: string }>;
+    systemLabel: string;
+    selectSystem: string;
+    loading: string;
+    latestVersion: string;
+    loadFailed: string;
+    cachedRelease: string;
+    unavailable: string;
+    retry: string;
+    installation: string;
+    allReleases: string;
+    close: string;
+    platforms: Record<'windows' | 'macos' | 'linux', {
+        label: string;
+        requirements: string;
+        download: string;
+        installHint: string;
+        steps: string[];
+    }>;
+}
+
 export interface Dictionary {
+    desktopDownload: DesktopDownloadDict;
     home: {
         title: string;
         description: string;

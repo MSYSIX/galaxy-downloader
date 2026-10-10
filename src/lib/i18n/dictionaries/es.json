@@ -940,5 +940,70 @@
         "retryButton": "Reintentar",
         "toastSuccess": "¡Comentario enviado con éxito!",
         "toastError": "No se pudo enviar. Inténtalo de nuevo."
+    },
+    "desktopDownload": {
+        "trigger": "App de escritorio",
+        "title": "Descargar la app de escritorio",
+        "description": "Gestiona las descargas en tu ordenador, con tareas por lotes e inicio de sesión en el navegador.",
+        "benefits": {
+            "local": {
+                "title": "Análisis y archivos en tu equipo",
+                "description": "Analiza y descarga localmente, con soporte para vídeo de mayor resolución. Los archivos se guardan en tu ordenador."
+            },
+            "batch": {
+                "title": "Descargas por lotes, en un solo lugar",
+                "description": "Descarga páginas de creadores y colecciones, y consulta tareas, progreso e historial."
+            },
+            "ready": {
+                "title": "Lista para usar, sin configuración",
+                "description": "Incluye el motor de descarga y FFmpeg, con inicio de sesión y verificación en el navegador."
+            }
+        },
+        "systemLabel": "Elige tu sistema",
+        "selectSystem": "Selecciona un sistema de escritorio",
+        "loading": "Buscando la última versión…",
+        "latestVersion": "Última versión estable",
+        "loadFailed": "No se puede obtener la última versión. Reintenta o descarga desde la página de versiones.",
+        "cachedRelease": "No se pueden buscar actualizaciones. Puedes descargar la última versión obtenida.",
+        "unavailable": "Esta versión no incluye un instalador para este sistema. Consulta la página de versiones.",
+        "retry": "Reintentar",
+        "installation": "Guía de instalación",
+        "allReleases": "Notas de versión y todas las descargas",
+        "close": "Cerrar",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "Windows x64 · Instalador (.exe)",
+                "download": "Descargar para Windows",
+                "installHint": "El instalador aún no está firmado. SmartScreen puede mostrar un aviso al abrirlo por primera vez.",
+                "steps": [
+                    "Descarga y abre el instalador, y elige la carpeta de instalación.",
+                    "Tras confirmar que el archivo procede de la página oficial, selecciona «Más información» → «Ejecutar de todas formas» si aparece SmartScreen.",
+                    "Abre Galaxy Downloader al terminar. Las próximas versiones permiten actualizar desde la app."
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple silicon",
+                "requirements": "Apple silicon (serie M) · macOS 13 o posterior. Aún no es compatible con Mac Intel.",
+                "download": "Descargar para macOS",
+                "installHint": "La app aún no está firmada. Puede ser necesario permitir su primera apertura en Privacidad y seguridad.",
+                "steps": [
+                    "Abre el .dmg y arrastra Galaxy Downloader a Aplicaciones.",
+                    "Ábrela desde Aplicaciones. Si macOS la bloquea, verifica su origen y permite abrirla en Ajustes del Sistema → Privacidad y seguridad.",
+                    "Cuando haya una actualización, sigue el aviso de la app para descargarla desde la página de versiones y reemplazarla."
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "Linux x64 / x86_64 · AppImage",
+                "download": "Descargar para Linux",
+                "installHint": "Después de descargarla, concede permiso de ejecución a la AppImage.",
+                "steps": [
+                    "Descarga la AppImage y guárdala en una carpeta permanente.",
+                    "En Propiedades → Permisos, permite ejecutar el archivo como programa (el texto varía según el escritorio).",
+                    "Haz doble clic en la AppImage para abrir la app."
+                ]
+            }
+        }
     }
 }

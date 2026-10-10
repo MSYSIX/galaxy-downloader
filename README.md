@@ -16,6 +16,7 @@
 
 ## 功能特点
 
+- 🖥️ 顶部“下载桌面版”入口，展示客户端优势、按系统下载最新正式版及安装说明
 - 🎵 支持 Bilibili 视频/音频下载
 - 🎬 支持抖音无水印视频下载及音频提取
 - 📱 支持 Instagram Reels、帖子和图文内容下载
@@ -38,6 +39,8 @@ pnpm dev
 ```
 
 在浏览器中打开 [http://localhost:3010](http://localhost:3010) 即可看到应用界面。
+
+桌面客户端下载入口的本地验证记录见 [docs/test-links.md](./docs/test-links.md)。
 
 ## 使用方法
 

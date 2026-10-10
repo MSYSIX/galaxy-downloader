@@ -938,5 +938,70 @@
         "retryButton": "重试",
         "toastSuccess": "反馈提交成功！",
         "toastError": "提交失败，请重试"
+    },
+    "desktopDownload": {
+        "trigger": "下载桌面版",
+        "title": "下载桌面版",
+        "description": "在电脑上管理下载，支持批量任务与浏览器登录。",
+        "benefits": {
+            "local": {
+                "title": "本地解析与保存",
+                "description": "解析和下载在本机执行，支持更高清画质下载，文件直接保存到电脑。"
+            },
+            "batch": {
+                "title": "批量下载，统一管理",
+                "description": "支持主页与合集，集中查看任务、进度和下载记录。"
+            },
+            "ready": {
+                "title": "开箱即用，无需配置",
+                "description": "内置下载引擎与 FFmpeg，支持浏览器登录与验证。"
+            }
+        },
+        "systemLabel": "选择你的系统",
+        "selectSystem": "请选择电脑系统",
+        "loading": "正在获取最新版本…",
+        "latestVersion": "最新正式版",
+        "loadFailed": "暂时无法获取最新版本，可重试或前往发布页下载。",
+        "cachedRelease": "最新版本暂时无法确认，仍可下载上次获取的版本。",
+        "unavailable": "此版本暂未提供该系统的安装包，请查看发布页。",
+        "retry": "重新获取",
+        "installation": "安装说明",
+        "allReleases": "发布说明与所有下载",
+        "close": "关闭",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "适用于 Windows x64 · 安装程序（.exe）",
+                "download": "下载 Windows 版",
+                "installHint": "安装包暂未签名，首次运行可能出现 SmartScreen 提醒。",
+                "steps": [
+                    "下载并打开安装程序，按提示选择安装位置。",
+                    "确认文件来自官方发布页后，如出现 SmartScreen 提醒，可点击“更多信息”→“仍要运行”。",
+                    "安装完成后打开 Galaxy Downloader。后续版本支持应用内更新。"
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple 芯片",
+                "requirements": "Apple 芯片（M 系列）· macOS 13 或更高版本；暂不支持 Intel Mac。",
+                "download": "下载 macOS 版",
+                "installHint": "安装包暂未签名，首次打开可能需要在“隐私与安全性”中允许。",
+                "steps": [
+                    "打开下载的 .dmg，将 Galaxy Downloader 拖入“应用程序”文件夹。",
+                    "从“应用程序”打开客户端。若系统阻止打开，确认下载来源后，到“系统设置”→“隐私与安全性”中允许打开。",
+                    "如有新版本，在应用提示中前往发布页下载并替换。"
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "适用于 Linux x64 / x86_64 · AppImage",
+                "download": "下载 Linux 版",
+                "installHint": "下载后需要赋予 AppImage 文件执行权限。",
+                "steps": [
+                    "下载 AppImage，并保存到你希望保留的位置。",
+                    "在文件属性的“权限”中勾选“允许作为程序执行”（名称可能因桌面环境而异）。",
+                    "双击 AppImage 打开客户端。"
+                ]
+            }
+        }
     }
 }

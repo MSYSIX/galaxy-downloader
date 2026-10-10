@@ -940,5 +940,70 @@
         "retryButton": "Retry",
         "toastSuccess": "Feedback submitted successfully!",
         "toastError": "Failed to submit, please try again"
+    },
+    "desktopDownload": {
+        "trigger": "Get desktop app",
+        "title": "Download the desktop app",
+        "description": "Manage downloads on your computer, with batch tasks and browser sign-in.",
+        "benefits": {
+            "local": {
+                "title": "Parse and save locally",
+                "description": "Parse and download locally, with support for higher-resolution video. Files go straight to your computer."
+            },
+            "batch": {
+                "title": "Batch downloads, one place",
+                "description": "Download creator pages and collections, and keep track of tasks, progress and history."
+            },
+            "ready": {
+                "title": "Ready to use, no setup",
+                "description": "The download engine and FFmpeg are included, with browser sign-in and verification."
+            }
+        },
+        "systemLabel": "Choose your system",
+        "selectSystem": "Select a desktop system",
+        "loading": "Checking the latest version…",
+        "latestVersion": "Latest stable release",
+        "loadFailed": "The latest release is unavailable. Try again or download from the release page.",
+        "cachedRelease": "Unable to check for updates. You can still download the last retrieved release.",
+        "unavailable": "This release has no installer for this system. Check the release page.",
+        "retry": "Try again",
+        "installation": "Installation guide",
+        "allReleases": "Release notes & all downloads",
+        "close": "Close",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "Windows x64 · Installer (.exe)",
+                "download": "Download for Windows",
+                "installHint": "The installer is not code-signed yet. SmartScreen may show a warning on first launch.",
+                "steps": [
+                    "Download and open the installer, then choose an installation folder.",
+                    "After confirming the file comes from the official release page, select “More info” → “Run anyway” if SmartScreen appears.",
+                    "Open Galaxy Downloader after installation. Future releases support in-app updates."
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple silicon",
+                "requirements": "Apple silicon (M series) · macOS 13 or later. Intel Macs are not supported yet.",
+                "download": "Download for macOS",
+                "installHint": "The app is not code-signed yet. You may need to allow its first launch in Privacy & Security.",
+                "steps": [
+                    "Open the downloaded .dmg and drag Galaxy Downloader into Applications.",
+                    "Launch it from Applications. If macOS blocks it, confirm the download source, then allow it in System Settings → Privacy & Security.",
+                    "When an update is available, follow the app prompt to download a replacement from the release page."
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "Linux x64 / x86_64 · AppImage",
+                "download": "Download for Linux",
+                "installHint": "Give the AppImage permission to run after downloading it.",
+                "steps": [
+                    "Download the AppImage and save it in a folder you want to keep.",
+                    "In the file’s Properties → Permissions, allow it to run as a program (wording varies by desktop environment).",
+                    "Double-click the AppImage to launch the app."
+                ]
+            }
+        }
     }
 }

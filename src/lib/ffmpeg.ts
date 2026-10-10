@@ -96,10 +96,8 @@ async function loadFFmpegCoreFromSource(ffmpeg: FFmpeg, baseURL: string) {
         : fetchBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm', signal)
     );
 
-    await withTimeout(FFMPEG_INITIALIZATION_TIMEOUT_MS, (signal) => ffmpeg.load({
-      coreURL,
-      wasmURL,
-    }, { signal }));
+    const loadConfig = { coreURL, wasmURL };
+    await withTimeout(FFMPEG_INITIALIZATION_TIMEOUT_MS, (signal) => ffmpeg.load(loadConfig, { signal }));
   } finally {
     if (!ffmpeg.loaded) {
       if (coreURL) {
