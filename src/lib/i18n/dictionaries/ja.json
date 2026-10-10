@@ -510,7 +510,11 @@
                 "features": [
                     "公開音声",
                     "エピソード再生",
-                    "ダウンロード"
+                    "ダウンロード",
+                    "エピソードの検索と選択"
+                ],
+                "limitations": [
+                    "公開アクセス可能な音声のみ対応。有料コンテンツ、購読、地域制限、ログイン、DRM は回避しません"
                 ]
             },
             "kuaishou": { "name": "Kuaishou", "summary": "動画と画像投稿" },
@@ -594,7 +598,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Download public Apple Podcasts audio with episode search, playback and individual downloads"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -617,7 +622,8 @@
                 "浏览器内处理",
                 "????????????????",
                 "下载 Threads 视频和图文帖子",
-                "下载微博视频、图文与混合媒体帖子"
+                "下载微博视频、图文与混合媒体帖子",
+                "下载 Apple Podcasts 公开播客音频，支持搜索单集、逐集播放与下载"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -640,7 +646,8 @@
                 "瀏覽器內處理",
                 "????????????????",
                 "下載 Threads 影片與圖文貼文",
-                "下載微博影片、圖文與混合媒體貼文"
+                "下載微博影片、圖文與混合媒體貼文",
+                "下載 Apple Podcasts 公開 Podcast 音訊，支援搜尋單集、逐集播放與下載"
             ],
             "ja": [
                 "Bilibili動画からMP3音声を抽出",
@@ -665,7 +672,8 @@
                 "複数のメディア形式に対応",
                 "ブラウザ内で処理",
                 "Threads の動画と画像投稿をダウンロード",
-                "Weibo の動画・画像・混合メディア投稿をダウンロード"
+                "Weibo の動画・画像・混合メディア投稿をダウンロード",
+                "Apple Podcasts の公開音声を検索し、エピソードごとに再生・ダウンロード"
             ],
             "es": [
                 "Extract MP3 audio from Bilibili videos",
@@ -687,7 +695,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Descargar audio público de Apple Podcasts con búsqueda, reproducción y descarga por episodio"
             ],
             "ru": [
                 "Extract MP3 audio from Bilibili videos",
@@ -709,7 +718,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Скачивание общедоступного аудио Apple Podcasts с поиском, воспроизведением и загрузкой отдельных эпизодов"
             ]
         },
         "howTo": {
@@ -846,7 +856,7 @@
         "sharePlayLinkCopied": "再生共有リンクをコピーしました",
         "previewPlayerTitle": "インラインプレビュー",
         "previewPlayerClose": "プレビューを閉じる",
-        "sharePlayPlayerTitle": "共有動画プレーヤー",
+        "sharePlayPlayerTitle": "共有メディアの再生",
         "sharePlayUnavailable": "この結果は直接再生できません。ダウンロードをご利用ください。",
         "originDownloadVideo": "動画直リンク",
         "originDownloadAudio": "音声直リンク",
@@ -877,7 +887,11 @@
         "packagingProgress": "画像 {current}/{total} をパッケージ化中",
         "videoList": "動画一覧",
         "videoCount": "{count} 件の動画",
-        "pureMusicHint": "このコンテンツは純粋な音声・音楽です。音声ファイルを直接ダウンロードできます。"
+        "pureMusicHint": "このコンテンツは純粋な音声・音楽です。音声ファイルを直接ダウンロードできます。",
+        "episodeList": "エピソード一覧",
+        "episodeCount": "全 {count} エピソード",
+        "episodeSearchPlaceholder": "エピソードのタイトルを検索...",
+        "episodeNoSearchResults": "一致するエピソードが見つかりません"
     },
     "changelog": {
         "title": "更新履歴"

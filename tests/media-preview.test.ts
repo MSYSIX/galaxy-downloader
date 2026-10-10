@@ -5,6 +5,7 @@ import {
     buildPagePreview,
     buildPrimaryResultPreview,
     buildResultPreviewForSelection,
+    buildMediaPreviewUrl,
     canPreviewEmbeddedVideoAudio,
     canPreviewEmbeddedVideoVideo,
     canPreviewPageAudio,
@@ -166,5 +167,30 @@ it('resolves an explicitly shared item and never falls back to another media typ
         item: 'missing',
         mediaType: 'audio',
     })).toBeNull()
+})
+
+// Podcast 分享必须按音频解析，否则指定单集会被当作视频而无法播放。
+it('plays the explicitly shared podcast episode as audio', () => {
+    const sourceUrl = 'https://podcasts.apple.com/tw/podcast/example/id123'
+    const result = {
+        title: 'Podcast',
+        platform: 'apple_podcasts',
+        url: sourceUrl,
+        kind: 'picker' as const,
+        downloadAudioUrl: null,
+        downloadVideoUrl: null,
+        originDownloadVideoUrl: null,
+        episodes: [
+            { id: 'first', title: 'First episode', downloadAudioUrl: 'https://cdn.example.com/first.mp3' },
+            { id: 'chosen', title: 'Chosen episode', downloadAudioUrl: 'https://cdn.example.com/chosen.mp3' },
+        ],
+    }
+    const preview = buildResultPreviewForSelection(result, { item: 'chosen', mediaType: 'audio' })
+    expect(preview).toMatchObject({ title: 'Chosen episode', mediaType: 'audio', item: 'chosen' })
+    const playUrl = new URL(buildMediaPreviewUrl(preview!), 'https://downloader.example')
+    expect(playUrl.searchParams.get('url')).toBe(sourceUrl)
+    expect(playUrl.searchParams.get('type')).toBe('audio')
+    expect(playUrl.searchParams.get('item')).toBe('chosen')
+    expect(buildResultPreviewForSelection(result, { item: 'chosen', mediaType: 'video' })).toBeNull()
 })
 })

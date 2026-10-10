@@ -510,7 +510,11 @@
                 "features": [
                     "Public audio",
                     "Episode playback",
-                    "Download"
+                    "Download",
+                    "Search and select episodes"
+                ],
+                "limitations": [
+                    "Publicly accessible audio only; paid content, subscriptions, region restrictions, login and DRM are not bypassed"
                 ]
             },
             "kuaishou": { "name": "Kuaishou", "summary": "Video and image posts" },
@@ -597,7 +601,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Download public Apple Podcasts audio with episode search, playback and individual downloads"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -620,7 +625,8 @@
                 "浏览器内处理",
                 "????????????????",
                 "下载 Threads 视频和图文帖子",
-                "下载微博视频、图文与混合媒体帖子"
+                "下载微博视频、图文与混合媒体帖子",
+                "下载 Apple Podcasts 公开播客音频，支持搜索单集、逐集播放与下载"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -643,7 +649,8 @@
                 "瀏覽器內處理",
                 "????????????????",
                 "下載 Threads 影片與圖文貼文",
-                "下載微博影片、圖文與混合媒體貼文"
+                "下載微博影片、圖文與混合媒體貼文",
+                "下載 Apple Podcasts 公開 Podcast 音訊，支援搜尋單集、逐集播放與下載"
             ],
             "ja": [
                 "Bilibili動画からMP3音声を抽出",
@@ -665,7 +672,8 @@
                 "複数のメディア形式に対応",
                 "ブラウザ内で処理",
                 "Threads の動画と画像投稿をダウンロード",
-                "Weibo の動画・画像・混合メディア投稿をダウンロード"
+                "Weibo の動画・画像・混合メディア投稿をダウンロード",
+                "Apple Podcasts の公開音声を検索し、エピソードごとに再生・ダウンロード"
             ],
             "es": [
                 "Extract MP3 audio from Bilibili videos",
@@ -690,7 +698,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Descargar audio público de Apple Podcasts con búsqueda, reproducción y descarga por episodio"
             ],
             "ru": [
                 "Extract MP3 audio from Bilibili videos",
@@ -715,7 +724,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Скачивание общедоступного аудио Apple Podcasts с поиском, воспроизведением и загрузкой отдельных эпизодов"
             ]
         },
         "howTo": {
@@ -852,7 +862,7 @@
         "sharePlayLinkCopied": "Playback share link copied",
         "previewPlayerTitle": "Inline Preview",
         "previewPlayerClose": "Close Preview",
-        "sharePlayPlayerTitle": "Shared Video Playback",
+        "sharePlayPlayerTitle": "Shared media playback",
         "sharePlayUnavailable": "Direct playback is unavailable for this result. Please use download options.",
         "originDownloadVideo": "Video Direct Link",
         "originDownloadAudio": "Audio Direct Link",
@@ -883,7 +893,11 @@
         "packagingProgress": "Packaging image {current}/{total}",
         "videoList": "Video List",
         "videoCount": "{count} videos",
-        "pureMusicHint": "This content is pure music/audio. Download the audio file directly."
+        "pureMusicHint": "This content is pure music/audio. Download the audio file directly.",
+        "episodeList": "Episodes",
+        "episodeCount": "{count} episodes",
+        "episodeSearchPlaceholder": "Search episode titles...",
+        "episodeNoSearchResults": "No matching episodes found"
     },
     "changelog": {
         "title": "Changelog"

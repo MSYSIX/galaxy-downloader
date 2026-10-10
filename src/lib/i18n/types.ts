@@ -4,6 +4,10 @@ export interface ResultDict {
     title: string;
     videoList: string;
     videoCount: string;
+    episodeList: string;
+    episodeCount: string;
+    episodeSearchPlaceholder: string;
+    episodeNoSearchResults: string;
     downloadVideo: string;
     browserDownloadVideo: string;
 

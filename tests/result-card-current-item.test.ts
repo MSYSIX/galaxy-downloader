@@ -12,6 +12,10 @@ vi.mock('@/i18n/client', () => ({
       title: 'Result',
       totalParts: '分P {count}',
       videoCount: '合集 {count}',
+      episodeList: '单集列表',
+      episodeCount: '共 {count} 集',
+      episodeSearchPlaceholder: '搜索单集标题',
+      episodeNoSearchResults: '未找到匹配的单集',
       videoList: '合集列表',
       collectionSearchPlaceholder: '搜索合集',
       collectionNoSearchResults: '无结果',
@@ -87,6 +91,55 @@ vi.mock('@/components/ui/input', () => ({
 import { ResultCard } from '../src/components/downloader/ResultCard'
 
 describe('ResultCard current collection item highlighting', () => {
+  const podcastResult = {
+    title: 'Podcast',
+    platform: 'apple_podcasts',
+    url: 'https://podcasts.apple.com/tw/podcast/example/id123',
+    kind: 'picker' as const,
+    downloadAudioUrl: null,
+    downloadVideoUrl: null,
+    originDownloadVideoUrl: null,
+    currentEpisodeId: 'second',
+    currentItemId: 'first',
+    episodes: [
+      { id: 'first', title: 'First episode', downloadAudioUrl: 'https://cdn.example.com/first.mp3' },
+      { id: 'second', title: 'Second episode', downloadAudioUrl: 'https://cdn.example.com/second.mp3' },
+    ],
+  }
+
+  test('Podcast 默认选择 currentEpisodeId 对应单集，优先于 currentItemId', () => {
+    const html = renderToStaticMarkup(React.createElement(ResultCard, {
+      result: podcastResult,
+      onClose: () => {},
+      onOpenExtractAudio: () => {},
+      onRequestPreview: () => {},
+      onClearPreview: () => {},
+    }))
+    expect(html).toMatch(/<audio[^>]+src="[^"]*type=audio[^"]*item=second"/)
+    expect(html).toMatch(/<button(?=[^>]*aria-label="播放音频: Second episode")(?=[^>]*disabled="")[^>]*>/)
+    expect(html).not.toContain('<video')
+  })
+
+  // 后端的明确单集响应仍可能包含 episodes，kind: audio 必须优先，不能显示多集选择器。
+  test('明确 Podcast 单集保持单音频界面，即使响应同时带有 episodes', () => {
+    const html = renderToStaticMarkup(React.createElement(ResultCard, {
+      result: {
+        ...podcastResult,
+        kind: 'audio',
+        url: `${podcastResult.url}?i=second`,
+        downloadAudioUrl: 'https://cdn.example.com/second.mp3',
+      },
+      onClose: () => {},
+      onOpenExtractAudio: () => {},
+      onRequestPreview: () => {},
+      onClearPreview: () => {},
+    }))
+    expect(html).not.toContain('aria-label="播放音频:')
+    expect(html).not.toContain('type="text"')
+    expect(html).toContain('aria-label="播放音频"')
+    expect(html).not.toContain('<video')
+  })
+
   test('合集列表应高亮 currentItemId 对应的视频项', () => {
     const result = {
       title: '测试合集',
