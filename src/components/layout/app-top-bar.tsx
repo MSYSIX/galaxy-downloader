@@ -9,6 +9,7 @@ import { DeferredLanguageSwitcher } from '@/components/deferred-language-switche
 import { DeferredChangelogDialog } from '@/components/deferred-changelog-dialog'
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { DeferredMobileNavMenu } from '@/components/deferred-mobile-nav-menu'
+import { DeferredDesktopDownloadDialog } from '@/components/deferred-desktop-download-dialog'
 import { useDictionary } from '@/i18n/client'
 import { i18n } from '@/lib/i18n/config'
 import { useTopBarActions } from './top-bar-actions'
@@ -100,6 +101,7 @@ export function AppTopBar({
             <div className="hidden md:block px-3 sm:px-4 md:px-4">
                 <div className="max-w-7xl mx-auto py-3 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1">
+                        <DeferredDesktopDownloadDialog />
                         {shouldShowHomeButton && (
                             <Button variant="ghost" size="sm" className="gap-1.5" asChild>
                                 <Link href={resolvedHomeHref}>

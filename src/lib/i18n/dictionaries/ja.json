@@ -510,7 +510,11 @@
                 "features": [
                     "公開音声",
                     "エピソード再生",
-                    "ダウンロード"
+                    "ダウンロード",
+                    "エピソードの検索と選択"
+                ],
+                "limitations": [
+                    "公開アクセス可能な音声のみ対応。有料コンテンツ、購読、地域制限、ログイン、DRM は回避しません"
                 ]
             },
             "kuaishou": { "name": "Kuaishou", "summary": "動画と画像投稿" },
@@ -594,7 +598,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Download public Apple Podcasts audio with episode search, playback and individual downloads"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -617,7 +622,8 @@
                 "浏览器内处理",
                 "????????????????",
                 "下载 Threads 视频和图文帖子",
-                "下载微博视频、图文与混合媒体帖子"
+                "下载微博视频、图文与混合媒体帖子",
+                "下载 Apple Podcasts 公开播客音频，支持搜索单集、逐集播放与下载"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -640,7 +646,8 @@
                 "瀏覽器內處理",
                 "????????????????",
                 "下載 Threads 影片與圖文貼文",
-                "下載微博影片、圖文與混合媒體貼文"
+                "下載微博影片、圖文與混合媒體貼文",
+                "下載 Apple Podcasts 公開 Podcast 音訊，支援搜尋單集、逐集播放與下載"
             ],
             "ja": [
                 "Bilibili動画からMP3音声を抽出",
@@ -665,7 +672,8 @@
                 "複数のメディア形式に対応",
                 "ブラウザ内で処理",
                 "Threads の動画と画像投稿をダウンロード",
-                "Weibo の動画・画像・混合メディア投稿をダウンロード"
+                "Weibo の動画・画像・混合メディア投稿をダウンロード",
+                "Apple Podcasts の公開音声を検索し、エピソードごとに再生・ダウンロード"
             ],
             "es": [
                 "Extract MP3 audio from Bilibili videos",
@@ -687,7 +695,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Descargar audio público de Apple Podcasts con búsqueda, reproducción y descarga por episodio"
             ],
             "ru": [
                 "Extract MP3 audio from Bilibili videos",
@@ -709,7 +718,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Скачивание общедоступного аудио Apple Podcasts с поиском, воспроизведением и загрузкой отдельных эпизодов"
             ]
         },
         "howTo": {
@@ -846,7 +856,7 @@
         "sharePlayLinkCopied": "再生共有リンクをコピーしました",
         "previewPlayerTitle": "インラインプレビュー",
         "previewPlayerClose": "プレビューを閉じる",
-        "sharePlayPlayerTitle": "共有動画プレーヤー",
+        "sharePlayPlayerTitle": "共有メディアの再生",
         "sharePlayUnavailable": "この結果は直接再生できません。ダウンロードをご利用ください。",
         "originDownloadVideo": "動画直リンク",
         "originDownloadAudio": "音声直リンク",
@@ -877,7 +887,11 @@
         "packagingProgress": "画像 {current}/{total} をパッケージ化中",
         "videoList": "動画一覧",
         "videoCount": "{count} 件の動画",
-        "pureMusicHint": "このコンテンツは純粋な音声・音楽です。音声ファイルを直接ダウンロードできます。"
+        "pureMusicHint": "このコンテンツは純粋な音声・音楽です。音声ファイルを直接ダウンロードできます。",
+        "episodeList": "エピソード一覧",
+        "episodeCount": "全 {count} エピソード",
+        "episodeSearchPlaceholder": "エピソードのタイトルを検索...",
+        "episodeNoSearchResults": "一致するエピソードが見つかりません"
     },
     "changelog": {
         "title": "更新履歴"
@@ -920,5 +934,70 @@
         "retryButton": "再試行",
         "toastSuccess": "フィードバックを送信しました！",
         "toastError": "送信に失敗しました。もう一度お試しください"
+    },
+    "desktopDownload": {
+        "trigger": "デスクトップ版",
+        "title": "デスクトップ版をダウンロード",
+        "description": "一括タスクやブラウザーへのログインに対応。パソコンでダウンロードを管理。",
+        "benefits": {
+            "local": {
+                "title": "解析と保存をローカルで",
+                "description": "解析とダウンロードはパソコン上で実行。より高画質な動画のダウンロードに対応し、ファイルを直接保存できます。"
+            },
+            "batch": {
+                "title": "一括ダウンロードをまとめて管理",
+                "description": "投稿者のページやコレクションに対応。タスク、進捗、履歴を一覧できます。"
+            },
+            "ready": {
+                "title": "設定不要ですぐに使える",
+                "description": "ダウンロードエンジンと FFmpeg を内蔵。ブラウザーでのログインと認証に対応。"
+            }
+        },
+        "systemLabel": "OS を選択",
+        "selectSystem": "パソコンの OS を選択",
+        "loading": "最新バージョンを確認中…",
+        "latestVersion": "最新の安定版",
+        "loadFailed": "最新バージョンを取得できません。再試行するか、リリースページからダウンロードしてください。",
+        "cachedRelease": "更新を確認できません。前回取得したバージョンはダウンロードできます。",
+        "unavailable": "このリリースには選択した OS のインストーラーがありません。リリースページをご確認ください。",
+        "retry": "再試行",
+        "installation": "インストール方法",
+        "allReleases": "リリースノートとすべてのダウンロード",
+        "close": "閉じる",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "Windows x64 · インストーラー（.exe）",
+                "download": "Windows 版をダウンロード",
+                "installHint": "インストーラーは未署名です。初回起動時に SmartScreen の警告が出る場合があります。",
+                "steps": [
+                    "インストーラーをダウンロードして開き、保存先を選択します。",
+                    "公式リリースページからのファイルであることを確認後、SmartScreen が表示された場合は「詳細情報」→「実行」を選択します。",
+                    "インストール後に Galaxy Downloader を開きます。以降はアプリ内の更新に対応します。"
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple シリコン",
+                "requirements": "Apple シリコン（M シリーズ）· macOS 13 以降。Intel Mac には未対応です。",
+                "download": "macOS 版をダウンロード",
+                "installHint": "アプリは未署名です。初回は「プライバシーとセキュリティ」で許可が必要な場合があります。",
+                "steps": [
+                    "ダウンロードした .dmg を開き、Galaxy Downloader を「アプリケーション」にドラッグします。",
+                    "「アプリケーション」から起動します。ブロックされた場合は入手元を確認し、「システム設定」→「プライバシーとセキュリティ」で許可します。",
+                    "新しいバージョンはアプリの案内からリリースページに移動し、ダウンロードして置き換えます。"
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "Linux x64 / x86_64 · AppImage",
+                "download": "Linux 版をダウンロード",
+                "installHint": "ダウンロード後、AppImage に実行権限を付与してください。",
+                "steps": [
+                    "AppImage をダウンロードし、保管するフォルダーに保存します。",
+                    "ファイルのプロパティの「権限」でプログラムとしての実行を許可します（名称は環境によって異なります）。",
+                    "AppImage をダブルクリックして起動します。"
+                ]
+            }
+        }
     }
 }

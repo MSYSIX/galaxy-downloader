@@ -1,6 +1,6 @@
 # 通用媒体下载器
 
-这是一个基于 [vinext](https://github.com/cloudflare/vinext) 运行的 Next.js App Router 兼容项目，支持从 Bilibili、抖音、Instagram、小红书、TikTok、X、Telegram、Threads、微信公众号、微博、Niconico、Vimeo、Dailymotion、Streamable、Reddit、Newgrounds、Tumblr、Pinterest、VK、OK.ru、Twitch、SoundCloud 等平台下载媒体内容。
+这是一个基于 [vinext](https://github.com/cloudflare/vinext) 运行的 Next.js App Router 兼容项目，支持从 Bilibili、抖音、Instagram、小红书、TikTok、X、Telegram、Threads、微信公众号、微博、Niconico、Vimeo、Dailymotion、Streamable、Reddit、Newgrounds、Tumblr、Pinterest、VK、OK.ru、Twitch、SoundCloud、Apple Podcasts 等平台下载媒体内容。
 
 ## 许可证
 
@@ -16,17 +16,19 @@
 
 ## 功能特点
 
+- 🖥️ 顶部“下载桌面版”入口，展示客户端优势、按系统下载最新正式版及安装说明
 - 🎵 支持 Bilibili 视频/音频下载
 - 🎬 支持抖音无水印视频下载及音频提取
 - 📱 支持 Instagram Reels、帖子和图文内容下载
 - 📷 支持小红书视频笔记和图文笔记下载
 - 🎞️ 支持 TikTok 视频下载
 - 🐦 支持 X 视频下载
+- 🎙️ 支持 Apple Podcasts 公开播客音频，节目页可搜索、选择单集并逐集播放、下载和分享播放链接
 - 🌐 支持 Vimeo、Dailymotion、Streamable、Reddit、Newgrounds、Tumblr、Pinterest、VK、OK.ru、Twitch、SoundCloud 等平台内容解析与下载
 - 🔍 自动识别平台链接
 - 🎨 现代化的用户界面设计
 - 💾 本地下载历史记录
-- 🌍 多语言支持（简体中文、繁体中文、英文、日文）
+- 🌍 多语言支持（简体中文、繁体中文、英文、日文、西班牙文、俄文）
 
 ## 开始使用
 
@@ -37,6 +39,8 @@ pnpm dev
 ```
 
 在浏览器中打开 [http://localhost:3010](http://localhost:3010) 即可看到应用界面。
+
+桌面客户端下载入口的本地验证记录见 [docs/test-links.md](./docs/test-links.md)。
 
 ## 使用方法
 
@@ -59,6 +63,8 @@ pnpm dev
 - **OK.ru**: `https://ok.ru/video/14627121662690`
 - **Twitch**: `https://m.twitch.tv/ninja/clip/SuaveNeighborlySrirachaHeyGirl-1J8kzeLFWxdUBZ4C`
 - **SoundCloud**: `https://soundcloud.com/forss/flickermood`
+- **Apple Podcasts 节目主页**: `https://podcasts.apple.com/tw/podcast/%E9%8C%A2%E5%BE%80%E5%93%AA%E8%A3%A1%E6%B5%81/id1888765575`
+- **Apple Podcasts 单集**: 节目链接带 `?i=<episodeId>`，仅展示该集的音频播放与下载
 
 ## 技术栈
 
@@ -98,11 +104,13 @@ pnpm dev
 - **OK.ru**: 内容下载
 - **Twitch**: 内容下载
 - **SoundCloud**: 内容下载
+- **Apple Podcasts**: 公开音频；节目主页支持搜索、选择和逐集下载，带 `?i=` 的链接直接展示单集
 
 说明：
 
 - 音频提取目前以浏览器端处理为主，受浏览器性能和文件大小影响
 - 图文内容支持按平台返回结果分别下载或打包下载
+- Apple Podcasts 仅支持公开可访问的音频，不绕过付费、订阅、地区限制、登录或 DRM；不提供全集压缩包或音频提取操作
 
 ## 本地开发
 

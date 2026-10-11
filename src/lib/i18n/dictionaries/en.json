@@ -510,7 +510,11 @@
                 "features": [
                     "Public audio",
                     "Episode playback",
-                    "Download"
+                    "Download",
+                    "Search and select episodes"
+                ],
+                "limitations": [
+                    "Publicly accessible audio only; paid content, subscriptions, region restrictions, login and DRM are not bypassed"
                 ]
             },
             "kuaishou": { "name": "Kuaishou", "summary": "Video and image posts" },
@@ -597,7 +601,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Download public Apple Podcasts audio with episode search, playback and individual downloads"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -620,7 +625,8 @@
                 "浏览器内处理",
                 "????????????????",
                 "下载 Threads 视频和图文帖子",
-                "下载微博视频、图文与混合媒体帖子"
+                "下载微博视频、图文与混合媒体帖子",
+                "下载 Apple Podcasts 公开播客音频，支持搜索单集、逐集播放与下载"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -643,7 +649,8 @@
                 "瀏覽器內處理",
                 "????????????????",
                 "下載 Threads 影片與圖文貼文",
-                "下載微博影片、圖文與混合媒體貼文"
+                "下載微博影片、圖文與混合媒體貼文",
+                "下載 Apple Podcasts 公開 Podcast 音訊，支援搜尋單集、逐集播放與下載"
             ],
             "ja": [
                 "Bilibili動画からMP3音声を抽出",
@@ -665,7 +672,8 @@
                 "複数のメディア形式に対応",
                 "ブラウザ内で処理",
                 "Threads の動画と画像投稿をダウンロード",
-                "Weibo の動画・画像・混合メディア投稿をダウンロード"
+                "Weibo の動画・画像・混合メディア投稿をダウンロード",
+                "Apple Podcasts の公開音声を検索し、エピソードごとに再生・ダウンロード"
             ],
             "es": [
                 "Extract MP3 audio from Bilibili videos",
@@ -690,7 +698,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Descargar audio público de Apple Podcasts con búsqueda, reproducción y descarga por episodio"
             ],
             "ru": [
                 "Extract MP3 audio from Bilibili videos",
@@ -715,7 +724,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Скачивание общедоступного аудио Apple Podcasts с поиском, воспроизведением и загрузкой отдельных эпизодов"
             ]
         },
         "howTo": {
@@ -852,7 +862,7 @@
         "sharePlayLinkCopied": "Playback share link copied",
         "previewPlayerTitle": "Inline Preview",
         "previewPlayerClose": "Close Preview",
-        "sharePlayPlayerTitle": "Shared Video Playback",
+        "sharePlayPlayerTitle": "Shared media playback",
         "sharePlayUnavailable": "Direct playback is unavailable for this result. Please use download options.",
         "originDownloadVideo": "Video Direct Link",
         "originDownloadAudio": "Audio Direct Link",
@@ -883,7 +893,11 @@
         "packagingProgress": "Packaging image {current}/{total}",
         "videoList": "Video List",
         "videoCount": "{count} videos",
-        "pureMusicHint": "This content is pure music/audio. Download the audio file directly."
+        "pureMusicHint": "This content is pure music/audio. Download the audio file directly.",
+        "episodeList": "Episodes",
+        "episodeCount": "{count} episodes",
+        "episodeSearchPlaceholder": "Search episode titles...",
+        "episodeNoSearchResults": "No matching episodes found"
     },
     "changelog": {
         "title": "Changelog"
@@ -926,5 +940,70 @@
         "retryButton": "Retry",
         "toastSuccess": "Feedback submitted successfully!",
         "toastError": "Failed to submit, please try again"
+    },
+    "desktopDownload": {
+        "trigger": "Get desktop app",
+        "title": "Download the desktop app",
+        "description": "Manage downloads on your computer, with batch tasks and browser sign-in.",
+        "benefits": {
+            "local": {
+                "title": "Parse and save locally",
+                "description": "Parse and download locally, with support for higher-resolution video. Files go straight to your computer."
+            },
+            "batch": {
+                "title": "Batch downloads, one place",
+                "description": "Download creator pages and collections, and keep track of tasks, progress and history."
+            },
+            "ready": {
+                "title": "Ready to use, no setup",
+                "description": "The download engine and FFmpeg are included, with browser sign-in and verification."
+            }
+        },
+        "systemLabel": "Choose your system",
+        "selectSystem": "Select a desktop system",
+        "loading": "Checking the latest version…",
+        "latestVersion": "Latest stable release",
+        "loadFailed": "The latest release is unavailable. Try again or download from the release page.",
+        "cachedRelease": "Unable to check for updates. You can still download the last retrieved release.",
+        "unavailable": "This release has no installer for this system. Check the release page.",
+        "retry": "Try again",
+        "installation": "Installation guide",
+        "allReleases": "Release notes & all downloads",
+        "close": "Close",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "Windows x64 · Installer (.exe)",
+                "download": "Download for Windows",
+                "installHint": "The installer is not code-signed yet. SmartScreen may show a warning on first launch.",
+                "steps": [
+                    "Download and open the installer, then choose an installation folder.",
+                    "After confirming the file comes from the official release page, select “More info” → “Run anyway” if SmartScreen appears.",
+                    "Open Galaxy Downloader after installation. Future releases support in-app updates."
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple silicon",
+                "requirements": "Apple silicon (M series) · macOS 13 or later. Intel Macs are not supported yet.",
+                "download": "Download for macOS",
+                "installHint": "The app is not code-signed yet. You may need to allow its first launch in Privacy & Security.",
+                "steps": [
+                    "Open the downloaded .dmg and drag Galaxy Downloader into Applications.",
+                    "Launch it from Applications. If macOS blocks it, confirm the download source, then allow it in System Settings → Privacy & Security.",
+                    "When an update is available, follow the app prompt to download a replacement from the release page."
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "Linux x64 / x86_64 · AppImage",
+                "download": "Download for Linux",
+                "installHint": "Give the AppImage permission to run after downloading it.",
+                "steps": [
+                    "Download the AppImage and save it in a folder you want to keep.",
+                    "In the file’s Properties → Permissions, allow it to run as a program (wording varies by desktop environment).",
+                    "Double-click the AppImage to launch the app."
+                ]
+            }
+        }
     }
 }

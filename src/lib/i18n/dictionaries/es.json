@@ -510,7 +510,11 @@
                 "features": [
                     "Audio público",
                     "Reproducción por episodio",
-                    "Descarga"
+                    "Descarga",
+                    "Buscar y seleccionar episodios"
+                ],
+                "limitations": [
+                    "Solo audio de acceso público; no se eluden pagos, suscripciones, restricciones regionales, inicio de sesión ni DRM"
                 ]
             },
             "kuaishou": { "name": "Kuaishou", "summary": "Videos y publicaciones con imágenes" },
@@ -597,7 +601,8 @@
                 "Admite múltiples formatos multimedia",
                 "Procesamiento basado en navegador",
                 "Descargar vídeos y publicaciones de imágenes de Threads",
-                "Descargue videos de Weibo y publicaciones de medios mixtos"
+                "Descargue videos de Weibo y publicaciones de medios mixtos",
+                "Download public Apple Podcasts audio with episode search, playback and individual downloads"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -620,7 +625,8 @@
                 "浏览器内处理",
                 "????????????????",
                 "下载 Hilos 视频和图文帖子",
-                "下载微博视频、图文与混合媒体帖子"
+                "下载微博视频、图文与混合媒体帖子",
+                "下载 Apple Podcasts 公开播客音频，支持搜索单集、逐集播放与下载"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -643,7 +649,8 @@
                 "瀏覽器內處理",
                 "????????????????",
                 "下載 Hilos 影片與圖文貼文",
-                "下載微博影片、圖文與混合媒體貼文"
+                "下載微博影片、圖文與混合媒體貼文",
+                "下載 Apple Podcasts 公開 Podcast 音訊，支援搜尋單集、逐集播放與下載"
             ],
             "ja": [
                 "Bilibili動画からMP3音声を抽出",
@@ -665,7 +672,8 @@
                 "複数のメディア形式に対応",
                 "ブラウザ内で処理",
                 "Temas の動画と画像投稿をダウンロード",
-                "Weibo の動画・画像・混合メディア投稿をダウンロード"
+                "Weibo の動画・画像・混合メディア投稿をダウンロード",
+                "Apple Podcasts の公開音声を検索し、エピソードごとに再生・ダウンロード"
             ],
             "es": [
                 "Extrae audio MP3 de vídeos de Bilibili",
@@ -690,7 +698,8 @@
                 "Admite múltiples formatos multimedia",
                 "Procesamiento basado en navegador",
                 "Descargar vídeos y publicaciones de imágenes de Threads",
-                "Descargue videos de Weibo y publicaciones de medios mixtos"
+                "Descargue videos de Weibo y publicaciones de medios mixtos",
+                "Descargar audio público de Apple Podcasts con búsqueda, reproducción y descarga por episodio"
             ],
             "ru": [
                 "Extract MP3 audio from Bilibili videos",
@@ -715,7 +724,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Скачивание общедоступного аудио Apple Podcasts с поиском, воспроизведением и загрузкой отдельных эпизодов"
             ]
         },
         "howTo": {
@@ -852,7 +862,7 @@
         "sharePlayLinkCopied": "Enlace para compartir reproducción copiado",
         "previewPlayerTitle": "Vista previa",
         "previewPlayerClose": "Cerrar vista previa",
-        "sharePlayPlayerTitle": "Reproducción de vídeo compartido",
+        "sharePlayPlayerTitle": "Reproducción de contenido compartido",
         "sharePlayUnavailable": "La reproducción directa no está disponible para este resultado. Utilice las opciones de descarga.",
         "originDownloadVideo": "Enlace directo de vídeo",
         "originDownloadAudio": "Enlace directo de audio",
@@ -883,7 +893,11 @@
         "packagingProgress": "Imagen de embalaje {current}/{total}",
         "videoList": "Lista de vídeos",
         "videoCount": "{count} vídeos",
-        "pureMusicHint": "Este contenido es pura música/audio. Descargue el archivo de audio directamente."
+        "pureMusicHint": "Este contenido es pura música/audio. Descargue el archivo de audio directamente.",
+        "episodeList": "Episodios",
+        "episodeCount": "{count} episodios",
+        "episodeSearchPlaceholder": "Buscar títulos de episodios...",
+        "episodeNoSearchResults": "No se encontraron episodios coincidentes"
     },
     "changelog": {
         "title": "Novedades"
@@ -926,5 +940,70 @@
         "retryButton": "Reintentar",
         "toastSuccess": "¡Comentario enviado con éxito!",
         "toastError": "No se pudo enviar. Inténtalo de nuevo."
+    },
+    "desktopDownload": {
+        "trigger": "App de escritorio",
+        "title": "Descargar la app de escritorio",
+        "description": "Gestiona las descargas en tu ordenador, con tareas por lotes e inicio de sesión en el navegador.",
+        "benefits": {
+            "local": {
+                "title": "Análisis y archivos en tu equipo",
+                "description": "Analiza y descarga localmente, con soporte para vídeo de mayor resolución. Los archivos se guardan en tu ordenador."
+            },
+            "batch": {
+                "title": "Descargas por lotes, en un solo lugar",
+                "description": "Descarga páginas de creadores y colecciones, y consulta tareas, progreso e historial."
+            },
+            "ready": {
+                "title": "Lista para usar, sin configuración",
+                "description": "Incluye el motor de descarga y FFmpeg, con inicio de sesión y verificación en el navegador."
+            }
+        },
+        "systemLabel": "Elige tu sistema",
+        "selectSystem": "Selecciona un sistema de escritorio",
+        "loading": "Buscando la última versión…",
+        "latestVersion": "Última versión estable",
+        "loadFailed": "No se puede obtener la última versión. Reintenta o descarga desde la página de versiones.",
+        "cachedRelease": "No se pueden buscar actualizaciones. Puedes descargar la última versión obtenida.",
+        "unavailable": "Esta versión no incluye un instalador para este sistema. Consulta la página de versiones.",
+        "retry": "Reintentar",
+        "installation": "Guía de instalación",
+        "allReleases": "Notas de versión y todas las descargas",
+        "close": "Cerrar",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "Windows x64 · Instalador (.exe)",
+                "download": "Descargar para Windows",
+                "installHint": "El instalador aún no está firmado. SmartScreen puede mostrar un aviso al abrirlo por primera vez.",
+                "steps": [
+                    "Descarga y abre el instalador, y elige la carpeta de instalación.",
+                    "Tras confirmar que el archivo procede de la página oficial, selecciona «Más información» → «Ejecutar de todas formas» si aparece SmartScreen.",
+                    "Abre Galaxy Downloader al terminar. Las próximas versiones permiten actualizar desde la app."
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple silicon",
+                "requirements": "Apple silicon (serie M) · macOS 13 o posterior. Aún no es compatible con Mac Intel.",
+                "download": "Descargar para macOS",
+                "installHint": "La app aún no está firmada. Puede ser necesario permitir su primera apertura en Privacidad y seguridad.",
+                "steps": [
+                    "Abre el .dmg y arrastra Galaxy Downloader a Aplicaciones.",
+                    "Ábrela desde Aplicaciones. Si macOS la bloquea, verifica su origen y permite abrirla en Ajustes del Sistema → Privacidad y seguridad.",
+                    "Cuando haya una actualización, sigue el aviso de la app para descargarla desde la página de versiones y reemplazarla."
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "Linux x64 / x86_64 · AppImage",
+                "download": "Descargar para Linux",
+                "installHint": "Después de descargarla, concede permiso de ejecución a la AppImage.",
+                "steps": [
+                    "Descarga la AppImage y guárdala en una carpeta permanente.",
+                    "En Propiedades → Permisos, permite ejecutar el archivo como programa (el texto varía según el escritorio).",
+                    "Haz doble clic en la AppImage para abrir la app."
+                ]
+            }
+        }
     }
 }

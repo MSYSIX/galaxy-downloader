@@ -79,9 +79,10 @@ export function PodcastEpisodeList({
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between gap-2 text-xs text-foreground/75">
-                <span className="min-w-0">
-                    {replaceTemplate(dict.result.videoCount, '{count}', String(filteredEpisodes.length))}
-                </span>
+                <div className="min-w-0">
+                    <h3 className="font-medium">{dict.result.episodeList}</h3>
+                    <span>{replaceTemplate(dict.result.episodeCount, '{count}', String(filteredEpisodes.length))}</span>
+                </div>
                 <div className="flex items-center gap-2 shrink-0">
                     <Input
                         value={searchQuery}
@@ -89,8 +90,8 @@ export function PodcastEpisodeList({
                             setSearchQuery(event.target.value);
                             setMobileVisibleCount(minimumVisibleCount);
                         }}
-                        placeholder={dict.result.collectionSearchPlaceholder}
-                        aria-label={dict.result.collectionSearchPlaceholder}
+                        placeholder={dict.result.episodeSearchPlaceholder}
+                        aria-label={dict.result.episodeSearchPlaceholder}
                         className="w-32 sm:w-56 h-8"
                     />
                 </div>
@@ -102,7 +103,7 @@ export function PodcastEpisodeList({
                 <div className="space-y-2 pr-2">
                     {filteredEpisodes.length === 0 && (
                         <p className="py-6 text-center text-sm text-muted-foreground">
-                            {dict.result.collectionNoSearchResults}
+                            {dict.result.episodeNoSearchResults}
                         </p>
                     )}
                     {visibleEpisodes.map((episode, index) => {

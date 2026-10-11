@@ -510,7 +510,11 @@
                 "features": [
                     "公開音訊",
                     "逐集播放",
-                    "下載"
+                    "下載",
+                    "搜尋與選擇單集"
+                ],
+                "limitations": [
+                    "僅支援公開可存取的音訊；不繞過付費、訂閱、地區限制、登入或 DRM"
                 ]
             },
             "kuaishou": { "name": "快手", "summary": "影片與圖文" },
@@ -595,7 +599,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Download public Apple Podcasts audio with episode search, playback and individual downloads"
             ],
             "zh": [
                 "提取哔哩哔哩视频MP3音频",
@@ -619,7 +624,8 @@
                 "浏览器内处理",
                 "????????????????",
                 "下载 Threads 视频和图文帖子",
-                "下载微博视频、图文与混合媒体帖子"
+                "下载微博视频、图文与混合媒体帖子",
+                "下载 Apple Podcasts 公开播客音频，支持搜索单集、逐集播放与下载"
             ],
             "zh-tw": [
                 "提取嗶哩嗶哩影片MP3音訊",
@@ -644,7 +650,8 @@
                 "支援多種媒體格式",
                 "瀏覽器內處理",
                 "下載 Threads 影片與圖文貼文",
-                "下載微博影片、圖文與混合媒體貼文"
+                "下載微博影片、圖文與混合媒體貼文",
+                "下載 Apple Podcasts 公開 Podcast 音訊，支援搜尋單集、逐集播放與下載"
             ],
             "ja": [
                 "Bilibili動画からMP3音声を抽出",
@@ -667,7 +674,8 @@
                 "複数のメディア形式に対応",
                 "ブラウザ内で処理",
                 "Threads の動画と画像投稿をダウンロード",
-                "Weibo の動画・画像・混合メディア投稿をダウンロード"
+                "Weibo の動画・画像・混合メディア投稿をダウンロード",
+                "Apple Podcasts の公開音声を検索し、エピソードごとに再生・ダウンロード"
             ],
             "es": [
                 "Extract MP3 audio from Bilibili videos",
@@ -690,7 +698,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Descargar audio público de Apple Podcasts con búsqueda, reproducción y descarga por episodio"
             ],
             "ru": [
                 "Extract MP3 audio from Bilibili videos",
@@ -713,7 +722,8 @@
                 "Support multiple media formats",
                 "Browser-based processing",
                 "Download Threads videos and image posts",
-                "Download Weibo videos and mixed-media posts"
+                "Download Weibo videos and mixed-media posts",
+                "Скачивание общедоступного аудио Apple Podcasts с поиском, воспроизведением и загрузкой отдельных эпизодов"
             ]
         },
         "howTo": {
@@ -850,7 +860,7 @@
         "sharePlayLinkCopied": "播放分享連結已複製",
         "previewPlayerTitle": "線上預覽",
         "previewPlayerClose": "關閉預覽",
-        "sharePlayPlayerTitle": "分享影片播放",
+        "sharePlayPlayerTitle": "分享媒體播放",
         "sharePlayUnavailable": "此內容暫不支援直接播放，請使用下載按鈕。",
         "originDownloadVideo": "影片直鏈",
         "originDownloadAudio": "音訊直鏈",
@@ -881,7 +891,11 @@
         "packagingProgress": "正在打包第 {current}/{total} 張圖片",
         "videoList": "影片列表",
         "videoCount": "共 {count} 個影片",
-        "pureMusicHint": "此內容為純音訊／音樂，可直接下載音訊檔案。"
+        "pureMusicHint": "此內容為純音訊／音樂，可直接下載音訊檔案。",
+        "episodeList": "單集列表",
+        "episodeCount": "共 {count} 集",
+        "episodeSearchPlaceholder": "搜尋單集標題...",
+        "episodeNoSearchResults": "未找到符合的單集"
     },
     "changelog": {
         "title": "更新日誌"
@@ -924,5 +938,70 @@
         "retryButton": "重試",
         "toastSuccess": "反饋提交成功！",
         "toastError": "提交失敗，請重試"
+    },
+    "desktopDownload": {
+        "trigger": "下載桌面版",
+        "title": "下載桌面版",
+        "description": "在電腦上管理下載，支援批次任務與瀏覽器登入。",
+        "benefits": {
+            "local": {
+                "title": "本機解析與儲存",
+                "description": "解析和下載在本機執行，支援更高畫質下載，檔案直接儲存到電腦。"
+            },
+            "batch": {
+                "title": "批次下載，統一管理",
+                "description": "支援創作者頁面與合集，集中查看任務、進度和下載記錄。"
+            },
+            "ready": {
+                "title": "開箱即用，無需設定",
+                "description": "內建下載引擎與 FFmpeg，支援瀏覽器登入與驗證。"
+            }
+        },
+        "systemLabel": "選擇你的系統",
+        "selectSystem": "請選擇電腦系統",
+        "loading": "正在取得最新版本…",
+        "latestVersion": "最新正式版",
+        "loadFailed": "暫時無法取得最新版本，可重試或前往發佈頁下載。",
+        "cachedRelease": "暫時無法確認最新版本，仍可下載上次取得的版本。",
+        "unavailable": "此版本尚未提供該系統的安裝檔，請查看發佈頁。",
+        "retry": "重新取得",
+        "installation": "安裝說明",
+        "allReleases": "版本說明與所有下載",
+        "close": "關閉",
+        "platforms": {
+            "windows": {
+                "label": "Windows · x64",
+                "requirements": "適用於 Windows x64 · 安裝程式（.exe）",
+                "download": "下載 Windows 版",
+                "installHint": "安裝檔尚未簽署，首次執行可能出現 SmartScreen 提醒。",
+                "steps": [
+                    "下載並開啟安裝程式，依照提示選擇安裝位置。",
+                    "確認檔案來自官方發佈頁後，若出現 SmartScreen 提醒，可點選「更多資訊」→「仍要執行」。",
+                    "安裝完成後開啟 Galaxy Downloader。後續版本支援應用程式內更新。"
+                ]
+            },
+            "macos": {
+                "label": "macOS · Apple 晶片",
+                "requirements": "Apple 晶片（M 系列）· macOS 13 或更新版本；暫不支援 Intel Mac。",
+                "download": "下載 macOS 版",
+                "installHint": "安裝檔尚未簽署，首次開啟可能需要在「隱私權與安全性」中允許。",
+                "steps": [
+                    "開啟下載的 .dmg，將 Galaxy Downloader 拖入「應用程式」資料夾。",
+                    "從「應用程式」開啟客戶端。若系統阻止開啟，確認下載來源後，到「系統設定」→「隱私權與安全性」中允許開啟。",
+                    "若有新版本，依照應用程式提示前往發佈頁下載並替換。"
+                ]
+            },
+            "linux": {
+                "label": "Linux · x64",
+                "requirements": "適用於 Linux x64 / x86_64 · AppImage",
+                "download": "下載 Linux 版",
+                "installHint": "下載後需授予 AppImage 檔案執行權限。",
+                "steps": [
+                    "下載 AppImage，儲存到你希望保留的位置。",
+                    "在檔案內容的「權限」中勾選「允許作為程式執行」（名稱可能依桌面環境而異）。",
+                    "按兩下 AppImage 開啟客戶端。"
+                ]
+            }
+        }
     }
 }

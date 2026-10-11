@@ -64,6 +64,7 @@ export function AudioResultPanel({
             const localePrefix = pathnameSegments[0] ? `/${pathnameSegments[0]}` : '';
             const shareUrl = new URL(`${window.location.origin}${localePrefix}/play`);
             shareUrl.searchParams.set('play', shareSourceUrl);
+            shareUrl.searchParams.set('type', 'audio');
             shareUrl.searchParams.set('autoplay', '1');
             await navigator.clipboard.writeText(shareUrl.toString());
             toast.success(dict.result.sharePlayLinkCopied);
